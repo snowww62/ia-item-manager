@@ -5,6 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IA Item Manager - Manage Your Internet Archive Collection</title>
     <meta name="description" content="A beautiful desktop application to manage your Internet Archive items and files with ease">
+    <script>
+        // Translations
+        const translations = {
+            en: {
+                title: "IA Item Manager",
+                subtitle: "Manage your Internet Archive collection with style",
+                downloadBtn: "Download Now",
+                githubBtn: "View on GitHub",
+                featuresTitle: "Features",
+                features: [
+                    { icon: "📤", title: "Upload Files", desc: "Upload files to Internet Archive with real-time progress tracking and support for multiple files" },
+                    { icon: "📁", title: "Manage Items", desc: "View, browse, and organize all your archived items with a beautiful modern interface" },
+                    { icon: "🔍", title: "Powerful Search", desc: "Quickly find your files with smart search that filters only your items" },
+                    { icon: "📝", title: "Edit Metadata", desc: "Update item metadata including title, description, subject, creator, and media type" },
+                    { icon: "➕", title: "Add to Collections", desc: "Easily add new files to your existing items and collections" },
+                    { icon: "🌍", title: "Multi-Language", desc: "Full support for English and French with more languages coming soon" },
+                    { icon: "🎨", title: "Modern UI", desc: "Elegant dark mode interface with smooth animations and intuitive navigation" },
+                    { icon: "🔐", title: "Secure & Private", desc: "Your credentials are stored locally and never sent to third-party servers" },
+                    { icon: "⬇️", title: "Direct Downloads", desc: "Optimized download links for all your files on Internet Archive" }
+                ],
+                downloadTitle: "Download",
+                recommended: "Recommended",
+                portableTitle: "Portable Version",
+                portableDesc: "No installation required. Just download and run!",
+                downloadPortable: "Download Portable",
+                installerTitle: "Installer Version",
+                installerDesc: "Classic Windows installer with Start Menu shortcuts",
+                downloadInstaller: "Download Installer",
+                requirements: "Windows 10/11 (64-bit) • Requires Internet Archive account",
+                madeBy: "Made by",
+                links: "Report Bug"
+            },
+            fr: {
+                title: "IA Item Manager",
+                subtitle: "Gérez votre collection Internet Archive avec style",
+                downloadBtn: "Télécharger",
+                githubBtn: "Voir sur GitHub",
+                featuresTitle: "Fonctionnalités",
+                features: [
+                    { icon: "📤", title: "Upload de fichiers", desc: "Uploadez vos fichiers sur Internet Archive avec suivi en temps réel et support de fichiers multiples" },
+                    { icon: "📁", title: "Gestion des items", desc: "Visualisez, parcourez et organisez tous vos items archivés avec une interface moderne" },
+                    { icon: "🔍", title: "Recherche puissante", desc: "Trouvez rapidement vos fichiers avec une recherche intelligente qui filtre uniquement vos items" },
+                    { icon: "📝", title: "Édition métadonnées", desc: "Mettez à jour les métadonnées incluant titre, description, sujet, créateur et type de média" },
+                    { icon: "➕", title: "Ajout aux collections", desc: "Ajoutez facilement de nouveaux fichiers à vos items et collections existants" },
+                    { icon: "🌍", title: "Multi-langue", desc: "Support complet pour l'anglais et le français avec plus de langues à venir" },
+                    { icon: "🎨", title: "Interface moderne", desc: "Interface élégante en mode sombre avec animations fluides et navigation intuitive" },
+                    { icon: "🔐", title: "Sécurisé & Privé", desc: "Vos identifiants sont stockés localement et jamais envoyés à des serveurs tiers" },
+                    { icon: "⬇️", title: "Téléchargements directs", desc: "Liens de téléchargement optimisés pour tous vos fichiers sur Internet Archive" }
+                ],
+                downloadTitle: "Téléchargement",
+                recommended: "Recommandé",
+                portableTitle: "Version Portable",
+                portableDesc: "Aucune installation requise. Téléchargez et lancez !",
+                downloadPortable: "Télécharger Portable",
+                installerTitle: "Version Installeur",
+                installerDesc: "Installeur Windows classique avec raccourcis menu Démarrer",
+                downloadInstaller: "Télécharger Installeur",
+                requirements: "Windows 10/11 (64-bit) • Nécessite un compte Internet Archive",
+                madeBy: "Créé par",
+                links: "Signaler un bug"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function switchLanguage() {
+            currentLang = currentLang === 'en' ? 'fr' : 'en';
+            const t = translations[currentLang];
+            
+            document.getElementById('page-title').textContent = t.title;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('download-btn').innerHTML = `<span>⬇️</span> ${t.downloadBtn}`;
+            document.getElementById('github-btn').innerHTML = `<span>⭐</span> ${t.githubBtn}`;
+            document.getElementById('features-title').textContent = `✨ ${t.featuresTitle}`;
+            document.getElementById('download-title').textContent = `📦 ${t.downloadTitle}`;
+            document.getElementById('recommended-badge').textContent = `⭐ ${t.recommended}`;
+            document.getElementById('portable-title').textContent = t.portableTitle;
+            document.getElementById('portable-desc').textContent = t.portableDesc;
+            document.getElementById('portable-btn').textContent = t.downloadPortable;
+            document.getElementById('installer-title').textContent = t.installerTitle;
+            document.getElementById('installer-desc').textContent = t.installerDesc;
+            document.getElementById('installer-btn').textContent = t.downloadInstaller;
+            document.getElementById('requirements').textContent = t.requirements;
+            document.getElementById('footer-made').innerHTML = `${t.madeBy} <strong>Snow</strong> • 2025`;
+            document.getElementById('footer-bug').textContent = t.links;
+            document.getElementById('lang-btn').textContent = currentLang === 'en' ? '🇫🇷 FR' : '🇬🇧 EN';
+            
+            // Update features
+            const featureCards = document.querySelectorAll('.feature-card');
+            t.features.forEach((feature, index) => {
+                if (featureCards[index]) {
+                    featureCards[index].querySelector('h3').textContent = feature.title;
+                    featureCards[index].querySelector('p').textContent = feature.desc;
+                }
+            });
+        }
+    </script>
     <style>
         * {
             margin: 0;
@@ -230,6 +327,32 @@
             text-decoration: underline;
         }
 
+        /* Language Toggle */
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .lang-toggle button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .lang-toggle button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             h1 {
@@ -254,6 +377,9 @@
     </style>
 </head>
 <body>
+    <div class="lang-toggle">
+        <button id="lang-btn" onclick="switchLanguage()">🇫🇷 FR</button>
+    </div>
     <header>
         <div class="container">
             <div class="logo">
@@ -263,13 +389,13 @@
                     <path d="M14 8l2 2-2 2"></path>
                 </svg>
             </div>
-            <h1>IA Item Manager</h1>
-            <p class="subtitle">Manage your Internet Archive collection with style</p>
+            <h1 id="page-title">IA Item Manager</h1>
+            <p class="subtitle" id="subtitle">Manage your Internet Archive collection with style</p>
             <div class="cta-buttons">
-                <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-primary">
+                <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-primary" id="download-btn">
                     <span>⬇️</span> Download Now
                 </a>
-                <a href="https://github.com/snowww62/ia-item-manager" class="btn btn-secondary">
+                <a href="https://github.com/snowww62/ia-item-manager" class="btn btn-secondary" id="github-btn">
                     <span>⭐</span> View on GitHub
                 </a>
             </div>
@@ -278,7 +404,7 @@
 
     <section class="features">
         <div class="container">
-            <h2 class="section-title">✨ Features</h2>
+            <h2 class="section-title" id="features-title">✨ Features</h2>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">📤</div>
@@ -331,40 +457,40 @@
 
     <section class="download-section">
         <div class="container">
-            <h2 class="section-title">📦 Download</h2>
+            <h2 class="section-title" id="download-title">📦 Download</h2>
             <div class="download-cards">
                 <div class="download-card recommended">
-                    <span class="recommended-badge">⭐ Recommended</span>
-                    <h3>Portable Version</h3>
+                    <span class="recommended-badge" id="recommended-badge">⭐ Recommended</span>
+                    <h3 id="portable-title">Portable Version</h3>
                     <p class="size">~70-150 MB</p>
-                    <p>No installation required. Just download and run!</p>
+                    <p id="portable-desc">No installation required. Just download and run!</p>
                     <br>
-                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest/download/IA-Item-Manager-Portable.exe" class="btn btn-primary">
+                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest/download/IA-Item-Manager-Portable.exe" class="btn btn-primary" id="portable-btn">
                         Download Portable
                     </a>
                 </div>
                 <div class="download-card">
-                    <h3>Installer Version</h3>
+                    <h3 id="installer-title">Installer Version</h3>
                     <p class="size">~70-150 MB</p>
-                    <p>Classic Windows installer with Start Menu shortcuts</p>
+                    <p id="installer-desc">Classic Windows installer with Start Menu shortcuts</p>
                     <br>
-                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-secondary">
+                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-secondary" id="installer-btn">
                         Download Installer
                     </a>
                 </div>
             </div>
             <div style="text-align: center; margin-top: 40px; color: #94a3b8;">
-                <p>Windows 10/11 (64-bit) • Requires Internet Archive account</p>
+                <p id="requirements">Windows 10/11 (64-bit) • Requires Internet Archive account</p>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="container">
-            <p>Made by <strong>Snow</strong> • 2025</p>
+            <p id="footer-made">Made by <strong>Snow</strong> • 2025</p>
             <p style="margin-top: 10px;">
                 <a href="https://github.com/snowww62/ia-item-manager">GitHub</a> • 
-                <a href="https://github.com/snowww62/ia-item-manager/issues">Report Bug</a> • 
+                <a href="https://github.com/snowww62/ia-item-manager/issues" id="footer-bug">Report Bug</a> • 
                 <a href="https://archive.org">Internet Archive</a>
             </p>
         </div>
