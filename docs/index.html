@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Item Manager - Manage Your Internet Archive Collection</title>
+    <meta name="description" content="A beautiful desktop application to manage your Internet Archive items and files with ease">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 60px 0 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo svg {
+            width: 70px;
+            height: 70px;
+            fill: white;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.4em;
+            color: #94a3b8;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Features */
+        .features {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 60px;
+            font-weight: 700;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #3b82f6;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+        }
+
+        /* Download Section */
+        .download-section {
+            padding: 80px 0;
+            background: rgba(59, 130, 246, 0.1);
+            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .download-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .download-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .download-card.recommended {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            position: relative;
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .download-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .download-card .size {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer p {
+            color: #94a3b8;
+        }
+
+        footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .subtitle {
+                font-size: 1.2em;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                    <path d="M14 8l2 2-2 2"></path>
+                </svg>
+            </div>
+            <h1>IA Item Manager</h1>
+            <p class="subtitle">Manage your Internet Archive collection with style</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-primary">
+                    <span>⬇️</span> Download Now
+                </a>
+                <a href="https://github.com/snowww62/ia-item-manager" class="btn btn-secondary">
+                    <span>⭐</span> View on GitHub
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">✨ Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📤</div>
+                    <h3>Upload Files</h3>
+                    <p>Upload files to Internet Archive with real-time progress tracking and support for multiple files</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3>Manage Items</h3>
+                    <p>View, browse, and organize all your archived items with a beautiful modern interface</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Powerful Search</h3>
+                    <p>Quickly find your files with smart search that filters only your items</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Edit Metadata</h3>
+                    <p>Update item metadata including title, description, subject, creator, and media type</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">➕</div>
+                    <h3>Add to Collections</h3>
+                    <p>Easily add new files to your existing items and collections</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Multi-Language</h3>
+                    <p>Full support for English and French with more languages coming soon</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Modern UI</h3>
+                    <p>Elegant dark mode interface with smooth animations and intuitive navigation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your credentials are stored locally and never sent to third-party servers</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⬇️</div>
+                    <h3>Direct Downloads</h3>
+                    <p>Optimized download links for all your files on Internet Archive</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="download-section">
+        <div class="container">
+            <h2 class="section-title">📦 Download</h2>
+            <div class="download-cards">
+                <div class="download-card recommended">
+                    <span class="recommended-badge">⭐ Recommended</span>
+                    <h3>Portable Version</h3>
+                    <p class="size">~70-150 MB</p>
+                    <p>No installation required. Just download and run!</p>
+                    <br>
+                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest/download/IA-Item-Manager-Portable.exe" class="btn btn-primary">
+                        Download Portable
+                    </a>
+                </div>
+                <div class="download-card">
+                    <h3>Installer Version</h3>
+                    <p class="size">~70-150 MB</p>
+                    <p>Classic Windows installer with Start Menu shortcuts</p>
+                    <br>
+                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-secondary">
+                        Download Installer
+                    </a>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 40px; color: #94a3b8;">
+                <p>Windows 10/11 (64-bit) • Requires Internet Archive account</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Made by <strong>Snow</strong> • 2025</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/snowww62/ia-item-manager">GitHub</a> • 
+                <a href="https://github.com/snowww62/ia-item-manager/issues">Report Bug</a> • 
+                <a href="https://archive.org">Internet Archive</a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
