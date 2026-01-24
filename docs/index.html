@@ -66,13 +66,73 @@
                 requirements: "Windows 10/11 (64-bit) • Nécessite un compte Internet Archive",
                 madeBy: "Créé par",
                 links: "Signaler un bug"
+            },
+            es: {
+                title: "IA Item Manager",
+                subtitle: "Gestiona tu colección de Internet Archive con estilo",
+                downloadBtn: "Descargar",
+                githubBtn: "Ver en GitHub",
+                featuresTitle: "Características",
+                features: [
+                    { icon: "📤", title: "Subir archivos", desc: "Sube archivos a Internet Archive con seguimiento en tiempo real y soporte para múltiples archivos" },
+                    { icon: "📁", title: "Gestionar items", desc: "Visualiza, navega y organiza todos tus items archivados con una interfaz moderna" },
+                    { icon: "🔍", title: "Búsqueda potente", desc: "Encuentra rápidamente tus archivos con búsqueda inteligente que filtra solo tus items" },
+                    { icon: "📝", title: "Editar metadatos", desc: "Actualiza metadatos incluyendo título, descripción, tema, creador y tipo de medio" },
+                    { icon: "➕", title: "Añadir a colecciones", desc: "Añade fácilmente nuevos archivos a tus items y colecciones existentes" },
+                    { icon: "🌍", title: "Multi-idioma", desc: "Soporte completo para inglés, francés, español y alemán" },
+                    { icon: "🎨", title: "Interfaz moderna", desc: "Interfaz elegante en modo oscuro con animaciones fluidas y navegación intuitiva" },
+                    { icon: "🔐", title: "Seguro y Privado", desc: "Tus credenciales se almacenan localmente y nunca se envían a servidores de terceros" },
+                    { icon: "⬇️", title: "Descargas directas", desc: "Enlaces de descarga optimizados para todos tus archivos en Internet Archive" }
+                ],
+                downloadTitle: "Descarga",
+                recommended: "Recomendado",
+                portableTitle: "Versión Portable",
+                portableDesc: "No requiere instalación. ¡Descarga y ejecuta!",
+                downloadPortable: "Descargar Portable",
+                installerTitle: "Versión Instalador",
+                installerDesc: "Instalador clásico de Windows con accesos directos en el menú Inicio",
+                downloadInstaller: "Descargar Instalador",
+                requirements: "Windows 10/11 (64-bit) • Requiere cuenta de Internet Archive",
+                madeBy: "Hecho por",
+                links: "Reportar error"
+            },
+            de: {
+                title: "IA Item Manager",
+                subtitle: "Verwalte deine Internet Archive Sammlung mit Stil",
+                downloadBtn: "Herunterladen",
+                githubBtn: "Auf GitHub ansehen",
+                featuresTitle: "Funktionen",
+                features: [
+                    { icon: "📤", title: "Dateien hochladen", desc: "Lade Dateien zu Internet Archive mit Echtzeit-Fortschrittsanzeige und Unterstützung für mehrere Dateien hoch" },
+                    { icon: "📁", title: "Items verwalten", desc: "Anzeigen, durchsuchen und organisieren Sie alle Ihre archivierten Items mit einer modernen Oberfläche" },
+                    { icon: "🔍", title: "Leistungsstarke Suche", desc: "Finden Sie schnell Ihre Dateien mit intelligenter Suche, die nur Ihre Items filtert" },
+                    { icon: "📝", title: "Metadaten bearbeiten", desc: "Aktualisieren Sie Metadaten einschließlich Titel, Beschreibung, Betreff, Ersteller und Medientyp" },
+                    { icon: "➕", title: "Zu Sammlungen hinzufügen", desc: "Fügen Sie einfach neue Dateien zu Ihren vorhandenen Items und Sammlungen hinzu" },
+                    { icon: "🌍", title: "Mehrsprachig", desc: "Vollständige Unterstützung für Englisch, Französisch, Spanisch und Deutsch" },
+                    { icon: "🎨", title: "Moderne Oberfläche", desc: "Elegante dunkle Oberfläche mit flüssigen Animationen und intuitiver Navigation" },
+                    { icon: "🔐", title: "Sicher & Privat", desc: "Ihre Anmeldeinformationen werden lokal gespeichert und niemals an Drittserver gesendet" },
+                    { icon: "⬇️", title: "Direkte Downloads", desc: "Optimierte Download-Links für alle Ihre Dateien auf Internet Archive" }
+                ],
+                downloadTitle: "Herunterladen",
+                recommended: "Empfohlen",
+                portableTitle: "Portable Version",
+                portableDesc: "Keine Installation erforderlich. Einfach herunterladen und ausführen!",
+                downloadPortable: "Portable herunterladen",
+                installerTitle: "Installer-Version",
+                installerDesc: "Klassischer Windows-Installer mit Verknüpfungen im Startmenü",
+                downloadInstaller: "Installer herunterladen",
+                requirements: "Windows 10/11 (64-bit) • Benötigt Internet Archive Konto",
+                madeBy: "Erstellt von",
+                links: "Fehler melden"
             }
         };
 
-        let currentLang = 'en';
+        let currentLang = 'fr'; // Français par défaut
+        const languages = ['fr', 'en', 'es', 'de'];
 
         function switchLanguage() {
-            currentLang = currentLang === 'en' ? 'fr' : 'en';
+            const currentIndex = languages.indexOf(currentLang);
+            currentLang = languages[(currentIndex + 1) % languages.length];
             const t = translations[currentLang];
             
             document.getElementById('page-title').textContent = t.title;
@@ -91,7 +151,14 @@
             document.getElementById('requirements').textContent = t.requirements;
             document.getElementById('footer-made').innerHTML = `${t.madeBy} <strong>Snow</strong> • 2025`;
             document.getElementById('footer-bug').textContent = t.links;
-            document.getElementById('lang-btn').textContent = currentLang === 'en' ? '🇫🇷 FR' : '🇬🇧 EN';
+            
+            const langLabels = {
+                'fr': '🇬🇧 EN',
+                'en': '🇪🇸 ES',
+                'es': '🇩🇪 DE',
+                'de': '🇫🇷 FR'
+            };
+            document.getElementById('lang-btn').textContent = langLabels[currentLang];
             
             // Update features
             const featureCards = document.querySelectorAll('.feature-card');
@@ -131,15 +198,12 @@
         }
 
         .logo {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             margin: 0 auto 30px;
-            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
         }
 
         .logo svg {
@@ -379,21 +443,21 @@
 </head>
 <body>
     <div class="lang-toggle">
-        <button id="lang-btn" onclick="switchLanguage()">🇫🇷 FR</button>
+        <button id="lang-btn" onclick="switchLanguage()">🇬🇧 EN</button>
     </div>
     <header>
         <div class="container">
             <div class="logo">
-                <img src="icon.png" alt="IA Item Manager" style="width: 80px; height: 80px; border-radius: 12px;">
+                <img src="icon.png" alt="IA Item Manager" style="width: 140px; height: 140px; border-radius: 16px;">
             </div>
             <h1 id="page-title">IA Item Manager</h1>
-            <p class="subtitle" id="subtitle">Manage your Internet Archive collection with style</p>
+            <p class="subtitle" id="subtitle">Gérez votre collection Internet Archive avec style</p>
             <div class="cta-buttons">
                 <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-primary" id="download-btn">
-                    <span>⬇️</span> Download Now
+                    <span>⬇️</span> Télécharger
                 </a>
                 <a href="https://github.com/snowww62/ia-item-manager" class="btn btn-secondary" id="github-btn">
-                    <span>⭐</span> View on GitHub
+                    <span>⭐</span> Voir sur GitHub
                 </a>
             </div>
         </div>
@@ -401,52 +465,52 @@
 
     <section class="features">
         <div class="container">
-            <h2 class="section-title" id="features-title">✨ Features</h2>
+            <h2 class="section-title" id="features-title">✨ Fonctionnalités</h2>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">📤</div>
-                    <h3>Upload Files</h3>
-                    <p>Upload files to Internet Archive with real-time progress tracking and support for multiple files</p>
+                    <h3>Upload de fichiers</h3>
+                    <p>Uploadez vos fichiers sur Internet Archive avec suivi en temps réel et support de fichiers multiples</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">📁</div>
-                    <h3>Manage Items</h3>
-                    <p>View, browse, and organize all your archived items with a beautiful modern interface</p>
+                    <h3>Gestion des items</h3>
+                    <p>Visualisez, parcourez et organisez tous vos items archivés avec une interface moderne</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🔍</div>
-                    <h3>Powerful Search</h3>
-                    <p>Quickly find your files with smart search that filters only your items</p>
+                    <h3>Recherche puissante</h3>
+                    <p>Trouvez rapidement vos fichiers avec une recherche intelligente qui filtre uniquement vos items</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">📝</div>
-                    <h3>Edit Metadata</h3>
-                    <p>Update item metadata including title, description, subject, creator, and media type</p>
+                    <h3>Édition métadonnées</h3>
+                    <p>Mettez à jour les métadonnées incluant titre, description, sujet, créateur et type de média</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">➕</div>
-                    <h3>Add to Collections</h3>
-                    <p>Easily add new files to your existing items and collections</p>
+                    <h3>Ajout aux collections</h3>
+                    <p>Ajoutez facilement de nouveaux fichiers à vos items et collections existants</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🌍</div>
-                    <h3>Multi-Language</h3>
-                    <p>Full support for English and French with more languages coming soon</p>
+                    <h3>Multi-langue</h3>
+                    <p>Support complet pour l'anglais, le français, l'espagnol et l'allemand</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🎨</div>
-                    <h3>Modern UI</h3>
-                    <p>Elegant dark mode interface with smooth animations and intuitive navigation</p>
+                    <h3>Interface moderne</h3>
+                    <p>Interface élégante en mode sombre avec animations fluides et navigation intuitive</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🔐</div>
-                    <h3>Secure & Private</h3>
-                    <p>Your credentials are stored locally and never sent to third-party servers</p>
+                    <h3>Sécurisé & Privé</h3>
+                    <p>Vos identifiants sont stockés localement et jamais envoyés à des serveurs tiers</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">⬇️</div>
-                    <h3>Direct Downloads</h3>
-                    <p>Optimized download links for all your files on Internet Archive</p>
+                    <h3>Téléchargements directs</h3>
+                    <p>Liens de téléchargement optimisés pour tous vos fichiers sur Internet Archive</p>
                 </div>
             </div>
         </div>
@@ -454,40 +518,40 @@
 
     <section class="download-section">
         <div class="container">
-            <h2 class="section-title" id="download-title">📦 Download</h2>
+            <h2 class="section-title" id="download-title">📦 Téléchargement</h2>
             <div class="download-cards">
                 <div class="download-card recommended">
-                    <span class="recommended-badge" id="recommended-badge">⭐ Recommended</span>
-                    <h3 id="portable-title">Portable Version</h3>
+                    <span class="recommended-badge" id="recommended-badge">⭐ Recommandé</span>
+                    <h3 id="portable-title">Version Portable</h3>
                     <p class="size">~70-150 MB</p>
-                    <p id="portable-desc">No installation required. Just download and run!</p>
+                    <p id="portable-desc">Aucune installation requise. Téléchargez et lancez !</p>
                     <br>
                     <a href="https://github.com/snowww62/ia-item-manager/releases/latest/download/IA-Item-Manager-Portable.exe" class="btn btn-primary" id="portable-btn">
-                        Download Portable
+                        Télécharger Portable
                     </a>
                 </div>
                 <div class="download-card">
-                    <h3 id="installer-title">Installer Version</h3>
+                    <h3 id="installer-title">Version Installeur</h3>
                     <p class="size">~70-150 MB</p>
-                    <p id="installer-desc">Classic Windows installer with Start Menu shortcuts</p>
+                    <p id="installer-desc">Installeur Windows classique avec raccourcis menu Démarrer</p>
                     <br>
                     <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-secondary" id="installer-btn">
-                        Download Installer
+                        Télécharger Installeur
                     </a>
                 </div>
             </div>
             <div style="text-align: center; margin-top: 40px; color: #94a3b8;">
-                <p id="requirements">Windows 10/11 (64-bit) • Requires Internet Archive account</p>
+                <p id="requirements">Windows 10/11 (64-bit) • Nécessite un compte Internet Archive</p>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="container">
-            <p id="footer-made">Made by <strong>Snow</strong> • 2025</p>
+            <p id="footer-made">Créé par <strong>Snow</strong> • 2025</p>
             <p style="margin-top: 10px;">
                 <a href="https://github.com/snowww62/ia-item-manager">GitHub</a> • 
-                <a href="https://github.com/snowww62/ia-item-manager/issues" id="footer-bug">Report Bug</a> • 
+                <a href="https://github.com/snowww62/ia-item-manager/issues" id="footer-bug">Signaler un bug</a> • 
                 <a href="https://archive.org">Internet Archive</a>
             </p>
         </div>
