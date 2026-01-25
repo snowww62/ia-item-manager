@@ -1,10 +1,10 @@
 SHA256 Checksums - IA Item Manager v1.0.0
 
 IA-Item-Manager-Portable.exe:
-ffa0cb0f939948c85b749e26b55f20d27785cdcfced0bc08dc59f7b1ec08f5f9
+a5c10f73fc5bf574ff9f98a03f7766bbf6a73cf4d3e794fc1070737454f52a68
 
 IA Item Manager Setup 1.0.0.exe:
-c94e8c37b4a618eae521bcbb37a61f18dd919a7bd6df5ddf3a56d696a82e58e6
+0b0e2de46f713ca0dd7da0cb5944048a20c97ee024d6bd332b43d0ae3aa812be
 
 
 certutil -hashfile "release/IA-Item-Manager-Portable.exe" SHA256
