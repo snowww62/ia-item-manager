@@ -20,7 +20,7 @@ A beautiful desktop application to manage your Internet Archive items and files 
 
 ## 📦 Download
 
-Get the latest release from the [Releases](https://github.com/YOUR_USERNAME/ia-item-manager/releases) page.
+Get the latest release from the [Releases](https://github.com/snowww62/ia-item-manager/releases) page.
 
 **Portable version recommended** - Just download `IA-Item-Manager-Portable.exe` and run it. No installation required!
 
