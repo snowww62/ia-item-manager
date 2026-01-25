@@ -75,27 +75,25 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, sec
     const fileBuffer = fs.readFileSync(filePath);
 
     const headers = {
-      'Authorization': `LOW ${accessKey}:${secretKey}`
+      'Authorization': `LOW ${accessKey}:${secretKey}`,
+      'User-Agent': 'ArchiveVault/1.0 (Desktop Application)',
+      'x-archive-interactive-priority': '1',
+      'x-archive-auto-make-bucket': '1'
     };
     
-    // Seulement créer un nouveau bucket si ce n'est PAS un item existant
     if (!isExistingItem) {
-      headers['x-amz-auto-make-bucket'] = '1';
+      headers['x-archive-meta01-collection'] = metadata?.collection || 'opensource_media';
+      headers['x-archive-meta-mediatype'] = metadata?.mediatype || 'data';
     }
     
-    // Ajouter les métadonnées en tant que headers x-archive-meta-
     if (metadata) {
       if (metadata.title) headers['x-archive-meta-title'] = metadata.title;
       if (metadata.description) headers['x-archive-meta-description'] = metadata.description;
       if (metadata.subject) headers['x-archive-meta-subject'] = metadata.subject;
       if (metadata.creator) headers['x-archive-meta-creator'] = metadata.creator;
-      if (metadata.mediatype) headers['x-archive-meta-mediatype'] = metadata.mediatype;
-      if (metadata.collection) headers['x-archive-meta01-collection'] = metadata.collection;
       if (metadata.language) headers['x-archive-meta-language'] = metadata.language;
       
-      // Options avancées
       if (metadata.queueDerive !== undefined) headers['x-archive-queue-derive'] = metadata.queueDerive;
-      if (metadata.interactivePriority) headers['x-archive-interactive-priority'] = '1';
       if (metadata.sizeHint) headers['x-archive-size-hint'] = metadata.sizeHint;
     }
 
@@ -110,7 +108,6 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, sec
       httpsAgent: new https.Agent({ 
         rejectUnauthorized: true
       }),
-      // IMPORTANT: beforeRedirect pour conserver les headers sur les redirections
       beforeRedirect: (options, { headers }) => {
         options.headers = { ...options.headers, 'Authorization': headers.Authorization };
       },

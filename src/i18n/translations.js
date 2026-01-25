@@ -30,7 +30,13 @@ export const translations = {
       uploadButton: 'Upload to Internet Archive',
       uploading: 'Uploading...',
       uploadSuccess: 'Uploaded successfully',
-      uploadFailed: 'Upload failed'
+      uploadFailed: 'Upload failed',
+      spamErrorTitle: '🚨 SPAM DETECTION - ACCOUNT TEMPORARILY BLOCKED',
+      spamErrorMessage: 'Your Internet Archive account is temporarily blocked for creating NEW items.\n\n✅ IMMEDIATE SOLUTION:\n1. Go to the "Items" tab\n2. Find an EXISTING item\n3. Click "Add Files" on that item\n4. Upload your files there (it works!)\n\n📧 TO UNBLOCK:\nContact info@archive.org and ask to remove the spam flag.\n\nMeanwhile, use ONLY existing items, not new items.',
+      newItemWarningTitle: '⚠️ Creating a NEW item',
+      newItemWarningText: 'If you get a "SlowDown" or "spam" error, your account is temporarily limited.',
+      newItemWarningSolution: '💡 Solution: Upload to an EXISTING item via Items tab → Add Files',
+      autoCollectionNote: 'ℹ️ Internet Archive will automatically assign your item to your account\'s collection. You can change the collection later via the web interface if needed.'
     },
 
     // Items Panel
@@ -159,7 +165,11 @@ export const translations = {
         },
         {
           question: "I get a '503 SlowDown' or 'spam' error when uploading. What should I do?",
-          answer: "Internet Archive may flag your upload as spam. Solutions: 1) Remove all links from title and description (upload with minimal text, edit later), 2) Avoid words like 'roms', 'iso', 'dump' in identifier, 3) Use simple identifiers like 'my-collection-2025'. If it persists, contact info@archive.org with the full error message."
+          answer: "🚨 ACCOUNT TEMPORARILY BLOCKED - Your account is limited for creating NEW items (not for adding to existing items). ✅ IMMEDIATE SOLUTION: Go to 'My Items' → Click an existing item → 'Add Files' button → Upload there (it works!). 📧 TO UNBLOCK: Wait 24-48h without creating new items, then contact info@archive.org. Meanwhile, use ONLY existing items."
+        },
+        {
+          question: "Why can I upload on the website but not in the app?",
+          answer: "On the website, you are probably adding files to EXISTING items, which is allowed even if your account is limited. The app works the same way: use 'My Items' → Select an item → 'Add Files' instead of creating a new item."
         }
       ]
     },
@@ -208,7 +218,15 @@ export const translations = {
       uploadButton: 'Uploader sur Internet Archive',
       uploading: 'Upload en cours...',
       uploadSuccess: 'Upload réussi',
-      uploadFailed: 'Échec de l\'upload'
+      uploadFailed: 'Échec de l\'upload',
+      spamErrorTitle: '🚨 SPAM DETECTION - ACCOUNT TEMPORAIREMENT BLOQUÉ',
+      spamErrorMessage: 'Votre compte Internet Archive est temporairement bloqué pour la création de NOUVEAUX items.\n\n✅ SOLUTION IMMÉDIATE:\n1. Allez dans l\'onglet "Items"\n2. Trouvez un item EXISTANT\n3. Cliquez sur "Add Files" sur cet item\n4. Uploadez vos fichiers là-bas (ça fonctionne!)\n\n📧 POUR DÉBLOQUER:\nContactez info@archive.org et demandez à retirer le flag spam.\n\nEn attendant, utilisez UNIQUEMENT des items existants, pas de nouveaux items.',
+      newItemWarningTitle: '⚠️ Création d\'un NOUVEL item',
+      newItemWarningText: 'Si vous obtenez une erreur "SlowDown" ou "spam", votre compte est temporairement limité.',
+      newItemWarningSolution: '💡 Solution: Uploadez sur un item EXISTANT via l\'onglet Items → Add Files',
+      autoCollectionNote: 'ℹ️ Internet Archive assignera automatiquement votre item à la collection de votre compte. Vous pouvez changer la collection plus tard via l\'interface web si nécessaire.',
+      lockedIdentifier: '🔒 Identifier verrouillé - Ajout de fichiers à un item existant',
+      existingItemNote: 'ℹ️ Vous ajoutez des fichiers à un item existant. Les métadonnées de l\'item ne seront pas modifiées.'
     },
 
     // Items Panel
@@ -337,7 +355,11 @@ export const translations = {
         },
         {
           question: "J'ai une erreur '503 SlowDown' ou 'spam' lors de l'upload. Que faire ?",
-          answer: "Internet Archive peut bloquer votre upload comme spam. Solutions : 1) Retirez tous les liens du titre et description (uploadez avec texte minimal, éditez après), 2) Évitez les mots 'roms', 'iso', 'dump' dans l'identifiant, 3) Utilisez des identifiants simples comme 'ma-collection-2025'. Si ça persiste, contactez info@archive.org avec le message d'erreur complet."
+          answer: "🚨 COMPTE TEMPORAIREMENT BLOQUÉ - Votre compte est limité pour créer de NOUVEAUX items (pas pour ajouter à des items existants). ✅ SOLUTION IMMÉDIATE : Allez dans 'Mes Items' → Cliquez sur un item existant → Bouton 'Add Files' → Uploadez là-bas (ça fonctionne!). 📧 POUR DÉBLOQUER : Attendez 24-48h sans créer de nouveaux items, puis contactez info@archive.org. En attendant, utilisez UNIQUEMENT des items existants."
+        },
+        {
+          question: "Pourquoi je peux uploader sur le site web mais pas dans l'app ?",
+          answer: "Sur le site web, vous ajoutez probablement des fichiers à des items EXISTANTS, ce qui est autorisé même si votre compte est limité. L'app fonctionne pareil : utilisez 'Mes Items' → Sélectionnez un item → 'Add Files' au lieu de créer un nouveau item."
         }
       ]
     },
@@ -386,7 +408,13 @@ export const translations = {
       uploadButton: 'Subir a Internet Archive',
       uploading: 'Subiendo...',
       uploadSuccess: 'Subido exitosamente',
-      uploadFailed: 'Fallo al subir'
+      uploadFailed: 'Fallo al subir',
+      spamErrorTitle: '🚨 DETECCIÓN DE SPAM - CUENTA TEMPORALMENTE BLOQUEADA',
+      spamErrorMessage: 'Su cuenta de Internet Archive está temporalmente bloqueada para crear NUEVOS items.\n\n✅ SOLUCIÓN INMEDIATA:\n1. Vaya a la pestaña "Items"\n2. Encuentre un item EXISTENTE\n3. Haga clic en "Add Files" en ese item\n4. Suba sus archivos allí (¡funciona!)\n\n📧 PARA DESBLOQUEAR:\nContacte a info@archive.org y solicite eliminar la marca de spam.\n\nMientras tanto, use SOLO items existentes, no nuevos items.',
+      newItemWarningTitle: '⚠️ Creando un NUEVO item',
+      newItemWarningText: 'Si obtiene un error "SlowDown" o "spam", su cuenta está temporalmente limitada.',
+      newItemWarningSolution: '💡 Solución: Suba a un item EXISTENTE vía Items → Add Files',
+      autoCollectionNote: 'ℹ️ Internet Archive asignará automáticamente su item a la colección de su cuenta. Puede cambiar la colección más tarde a través de la interfaz web si es necesario.'
     },
 
     // Items Panel
@@ -515,7 +543,11 @@ export const translations = {
         },
         {
           question: "Recibo un error '503 SlowDown' o 'spam' al subir. ¿Qué debo hacer?",
-          answer: "Internet Archive puede marcar tu subida como spam. Soluciones: 1) Elimina todos los enlaces del título y descripción (sube con texto mínimo, edita después), 2) Evita palabras como 'roms', 'iso', 'dump' en el identificador, 3) Usa identificadores simples como 'mi-coleccion-2025'. Si persiste, contacta info@archive.org con el mensaje de error completo."
+          answer: "🚨 CUENTA TEMPORALMENTE BLOQUEADA - Su cuenta está limitada para crear NUEVOS items (no para agregar a items existentes). ✅ SOLUCIÓN INMEDIATA: Vaya a 'Mis Items' → Haga clic en un item existente → Botón 'Add Files' → Suba allí (¡funciona!). 📧 PARA DESBLOQUEAR: Espere 24-48h sin crear nuevos items, luego contacte info@archive.org. Mientras tanto, use SOLO items existentes."
+        },
+        {
+          question: "¿Por qué puedo subir en el sitio web pero no en la app?",
+          answer: "En el sitio web, probablemente está agregando archivos a items EXISTENTES, lo cual está permitido incluso si su cuenta está limitada. La app funciona igual: use 'Mis Items' → Seleccione un item → 'Add Files' en lugar de crear un nuevo item."
         }
       ]
     },
@@ -564,7 +596,13 @@ export const translations = {
       uploadButton: 'Auf Internet Archive hochladen',
       uploading: 'Hochladen...',
       uploadSuccess: 'Erfolgreich hochgeladen',
-      uploadFailed: 'Hochladen fehlgeschlagen'
+      uploadFailed: 'Hochladen fehlgeschlagen',
+      spamErrorTitle: '🚨 SPAM-ERKENNUNG - KONTO TEMPORÄR GESPERRT',
+      spamErrorMessage: 'Ihr Internet Archive-Konto ist vorübergehend für das Erstellen NEUER Elemente gesperrt.\n\n✅ SOFORTIGE LÖSUNG:\n1. Gehen Sie zur Registerkarte "Items"\n2. Finden Sie ein VORHANDENES Element\n3. Klicken Sie auf "Add Files" bei diesem Element\n4. Laden Sie Ihre Dateien dort hoch (es funktioniert!)\n\n📧 ZUM ENTSPERREN:\nKontaktieren Sie info@archive.org und bitten Sie, die Spam-Markierung zu entfernen.\n\nVerwenden Sie in der Zwischenzeit NUR vorhandene Elemente, keine neuen Elemente.',
+      newItemWarningTitle: '⚠️ Erstellen eines NEUEN Elements',
+      newItemWarningText: 'Wenn Sie einen "SlowDown"- oder "Spam"-Fehler erhalten, ist Ihr Konto vorübergehend eingeschränkt.',
+      newItemWarningSolution: '💡 Lösung: Laden Sie zu einem VORHANDENEN Element über Items → Add Files hoch',
+      autoCollectionNote: 'ℹ️ Internet Archive wird Ihr Element automatisch der Sammlung Ihres Kontos zuweisen. Sie können die Sammlung später bei Bedarf über die Weboberfläche ändern.'
     },
 
     // Items Panel
@@ -693,7 +731,11 @@ export const translations = {
         },
         {
           question: "Ich erhalte einen '503 SlowDown'- oder 'Spam'-Fehler beim Hochladen. Was soll ich tun?",
-          answer: "Internet Archive könnte Ihren Upload als Spam markieren. Lösungen: 1) Entfernen Sie alle Links aus Titel und Beschreibung (laden Sie mit minimalem Text hoch, bearbeiten Sie später), 2) Vermeiden Sie Wörter wie 'roms', 'iso', 'dump' in der Kennung, 3) Verwenden Sie einfache Kennungen wie 'meine-sammlung-2025'. Wenn es weiterhin besteht, kontaktieren Sie info@archive.org mit der vollständigen Fehlermeldung."
+          answer: "🚨 KONTO TEMPORÄR GESPERRT - Ihr Konto ist für das Erstellen NEUER Elemente eingeschränkt (nicht für das Hinzufügen zu vorhandenen Elementen). ✅ SOFORTIGE LÖSUNG: Gehen Sie zu 'Meine Elemente' → Klicken Sie auf ein vorhandenes Element → 'Add Files'-Schaltfläche → Laden Sie dort hoch (es funktioniert!). 📧 ZUM ENTSPERREN: Warten Sie 24-48h ohne neue Elemente zu erstellen, kontaktieren Sie dann info@archive.org. Verwenden Sie in der Zwischenzeit NUR vorhandene Elemente."
+        },
+        {
+          question: "Warum kann ich auf der Website hochladen, aber nicht in der App?",
+          answer: "Auf der Website fügen Sie wahrscheinlich Dateien zu VORHANDENEN Elementen hinzu, was erlaubt ist, auch wenn Ihr Konto eingeschränkt ist. Die App funktioniert genauso: Verwenden Sie 'Meine Elemente' → Wählen Sie ein Element → 'Add Files' anstatt ein neues Element zu erstellen."
         }
       ]
     },

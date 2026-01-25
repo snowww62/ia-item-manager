@@ -8,6 +8,8 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
   const [identifier, setIdentifier] = useState(prefilledIdentifier || '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [collection, setCollection] = useState('opensource_media');
+  const [mediatype, setMediatype] = useState('data');
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
 
@@ -57,7 +59,8 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
     setUploading(true);
     const newStatus = {};
 
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       try {
         newStatus[file.name] = { progress: 0, status: 'uploading' };
         setUploadStatus({ ...newStatus });
@@ -67,20 +70,33 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
           filePath: file.path,
           accessKey: credentials.accessKey,
           secretKey: credentials.secretKey,
-          isExistingItem: !!prefilledIdentifier, // Si identifier pré-rempli = item existant
+          isExistingItem: !!prefilledIdentifier,
           metadata: {
             title,
             description,
-            mediatype: 'data'
+            collection,
+            mediatype
           }
         });
 
         if (result.success) {
           newStatus[file.name] = { progress: 100, status: 'success' };
         } else {
-          newStatus[file.name] = { progress: 0, status: 'error', error: result.error };
+          const errorMsg = typeof result.error === 'string' ? result.error : JSON.stringify(result.error);
+          
+          if (errorMsg.includes('SlowDown') || errorMsg.includes('spam')) {
+            alert(t('upload.spamErrorTitle') + '\n\n' + t('upload.spamErrorMessage'));
+            setUploading(false);
+            return;
+          }
+          
+          newStatus[file.name] = { progress: 0, status: 'error', error: errorMsg };
         }
         setUploadStatus({ ...newStatus });
+
+        if (i < files.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
       } catch (error) {
         newStatus[file.name] = { progress: 0, status: 'error', error: error.message };
         setUploadStatus({ ...newStatus });
@@ -119,13 +135,24 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
                 />
                 <p className="text-xs text-slate-400 mt-1">
                   {prefilledIdentifier 
-                    ? '🔒 Identifier verrouillé - Ajout de fichiers à un item existant' 
+                    ? t('upload.lockedIdentifier')
                     : t('upload.identifierHelp')}
                 </p>
               </div>
 
               {!prefilledIdentifier && (
                 <>
+                  <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-yellow-200 font-semibold mb-2">
+                      {t('upload.newItemWarningTitle')}
+                    </p>
+                    <p className="text-xs text-yellow-100 mb-2">
+                      {t('upload.newItemWarningText')}
+                    </p>
+                    <p className="text-xs text-yellow-100 font-semibold">
+                      {t('upload.newItemWarningSolution')}
+                    </p>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">
                       {t('upload.title')}
@@ -151,13 +178,47 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white resize-none"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                      Collection * (Required)
+                    </label>
+                    <select
+                      value={collection}
+                      onChange={(e) => {
+                        const selectedCollection = e.target.value;
+                        setCollection(selectedCollection);
+                        
+                        const mediatypeMap = {
+                          'opensource_media': 'data',
+                          'opensource_movies': 'movies',
+                          'opensource': 'texts',
+                          'opensource_audio': 'audio',
+                          'opensource_image': 'image',
+                          'open_source_software': 'software'
+                        };
+                        setMediatype(mediatypeMap[selectedCollection] || 'data');
+                      }}
+                      className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                    >
+                      <option value="opensource_media">Community Data</option>
+                      <option value="opensource_movies">Community Movies</option>
+                      <option value="opensource">Community Texts</option>
+                      <option value="opensource_audio">Community Audio</option>
+                      <option value="opensource_image">Community Image</option>
+                      <option value="open_source_software">Community Software</option>
+                    </select>
+                    <p className="text-xs text-slate-400 mt-1">
+                      ✅ Required to prevent spam detection. Mediatype will be set automatically.
+                    </p>
+                  </div>
                 </>
               )}
               
               {prefilledIdentifier && (
                 <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
                   <p className="text-sm text-blue-200">
-                    ℹ️ Vous ajoutez des fichiers à un item existant. Les métadonnées de l'item ne seront pas modifiées.
+                    {t('upload.existingItemNote')}
                   </p>
                 </div>
               )}
