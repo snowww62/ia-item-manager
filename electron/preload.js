@@ -10,7 +10,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkLimits: (data) => ipcRenderer.invoke('ia:checkLimits', data),
   openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),
   openMultipleFilesDialog: () => ipcRenderer.invoke('dialog:openMultipleFiles'),
+  saveCredentials: (data) => ipcRenderer.invoke('credentials:save', data),
+  loadCredentials: (data) => ipcRenderer.invoke('credentials:load', data),
+  isEncryptionAvailable: () => ipcRenderer.invoke('credentials:isEncryptionAvailable'),
   onUploadProgress: (callback) => {
     ipcRenderer.on('upload-progress', (event, data) => callback(data));
+  },
+  removeUploadProgressListener: () => {
+    ipcRenderer.removeAllListeners('upload-progress');
   }
 });

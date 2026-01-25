@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, safeStorage } = require('electron');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
@@ -6,6 +6,54 @@ const fs = require('fs');
 const https = require('https');
 
 let mainWindow;
+
+const axiosInstance = axios.create({
+  timeout: 60000,
+  maxBodyLength: Infinity,
+  maxContentLength: Infinity,
+  maxRedirects: 5,
+  httpsAgent: new https.Agent({ 
+    rejectUnauthorized: true
+  })
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  if (config.headers.Authorization) {
+    config._authHeader = config.headers.Authorization;
+  }
+  return config;
+});
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+    if (config._authHeader && error.response?.status === 301) {
+      config.headers.Authorization = config._authHeader;
+      return axiosInstance(config);
+    }
+    return Promise.reject(error);
+  }
+);
+
+async function retryOperation(operation, maxRetries = 3, baseDelay = 1000) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      const isLastAttempt = attempt === maxRetries - 1;
+      const isRetryable = error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT' || 
+                          error.response?.status === 503 || error.response?.status === 429;
+      
+      if (isLastAttempt || !isRetryable) {
+        throw error;
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -49,9 +97,49 @@ app.on('activate', () => {
   }
 });
 
+ipcMain.handle('credentials:save', async (event, { accessKey, secretKey }) => {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) {
+      return { success: false, error: 'Encryption not available' };
+    }
+    
+    const encryptedAccess = safeStorage.encryptString(accessKey);
+    const encryptedSecret = safeStorage.encryptString(secretKey);
+    
+    return { 
+      success: true, 
+      encrypted: {
+        accessKey: encryptedAccess.toString('base64'),
+        secretKey: encryptedSecret.toString('base64')
+      }
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('credentials:load', async (event, { encryptedAccessKey, encryptedSecretKey }) => {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) {
+      return { success: false, error: 'Encryption not available' };
+    }
+    
+    const accessKey = safeStorage.decryptString(Buffer.from(encryptedAccessKey, 'base64'));
+    const secretKey = safeStorage.decryptString(Buffer.from(encryptedSecretKey, 'base64'));
+    
+    return { success: true, credentials: { accessKey, secretKey } };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('credentials:isEncryptionAvailable', async () => {
+  return safeStorage.isEncryptionAvailable();
+});
+
 ipcMain.handle('ia:checkLimits', async (event, { accessKey, identifier }) => {
   try {
-    const response = await axios.get('https://s3.us.archive.org/', {
+    const response = await axiosInstance.get('https://s3.us.archive.org/', {
       params: {
         check_limit: 1,
         accesskey: accessKey,
@@ -69,7 +157,7 @@ ipcMain.handle('ia:checkLimits', async (event, { accessKey, identifier }) => {
   }
 });
 
-ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, secretKey, metadata, isExistingItem }) => {
+ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, secretKey, metadata, isExistingItem, sizeHint }) => {
   try {
     const fileName = path.basename(filePath);
     const fileBuffer = fs.readFileSync(filePath);
@@ -80,6 +168,10 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, sec
       'x-archive-interactive-priority': '1',
       'x-archive-auto-make-bucket': '1'
     };
+    
+    if (sizeHint) {
+      headers['x-archive-size-hint'] = sizeHint.toString();
+    }
     
     if (!isExistingItem) {
       headers['x-archive-meta01-collection'] = metadata?.collection || 'opensource_media';
@@ -94,29 +186,21 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, sec
       if (metadata.language) headers['x-archive-meta-language'] = metadata.language;
       
       if (metadata.queueDerive !== undefined) headers['x-archive-queue-derive'] = metadata.queueDerive;
-      if (metadata.sizeHint) headers['x-archive-size-hint'] = metadata.sizeHint;
     }
 
-    const response = await axios({
-      method: 'put',
-      url: `https://s3.us.archive.org/${identifier}/${encodeURIComponent(fileName)}`,
-      data: fileBuffer,
-      headers: headers,
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity,
-      maxRedirects: 5,
-      httpsAgent: new https.Agent({ 
-        rejectUnauthorized: true
-      }),
-      beforeRedirect: (options, { headers }) => {
-        options.headers = { ...options.headers, 'Authorization': headers.Authorization };
-      },
-      onUploadProgress: (progressEvent) => {
-        if (progressEvent.total) {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          mainWindow.webContents.send('upload-progress', { fileName, progress: percentCompleted });
+    const response = await retryOperation(async () => {
+      return await axiosInstance({
+        method: 'put',
+        url: `https://s3.us.archive.org/${identifier}/${encodeURIComponent(fileName)}`,
+        data: fileBuffer,
+        headers: headers,
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            mainWindow.webContents.send('upload-progress', { fileName, progress: percentCompleted });
+          }
         }
-      }
+      });
     });
 
     return { success: true, data: response.data };
@@ -130,11 +214,9 @@ ipcMain.handle('ia:getItems', async (event, { accessKey, secretKey, query }) => 
   try {
     let searchQuery = query;
     
-    // Si pas de query personnalisée, essayer d'obtenir les items de l'utilisateur
     if (!searchQuery) {
       try {
-        // Obtenir les informations de l'utilisateur via l'API
-        const userResponse = await axios.get('https://archive.org/services/xauthn/', {
+        const userResponse = await axiosInstance.get('https://archive.org/services/xauthn/', {
           headers: {
             'Authorization': `LOW ${accessKey}:${secretKey}`
           }
@@ -144,16 +226,14 @@ ipcMain.handle('ia:getItems', async (event, { accessKey, secretKey, query }) => 
           const screenname = userResponse.data.values.screenname;
           searchQuery = `uploader:"${screenname}"`;
         } else {
-          // Fallback: rechercher tous les items (non filtré)
           searchQuery = 'mediatype:data OR mediatype:movies OR mediatype:audio OR mediatype:texts';
         }
       } catch (userError) {
-        // Fallback: rechercher avec l'access key (au cas où ça marcherait)
         searchQuery = `uploader:${accessKey}`;
       }
     }
     
-    const response = await axios.get('https://archive.org/advancedsearch.php', {
+    const response = await axiosInstance.get('https://archive.org/advancedsearch.php', {
       params: {
         q: searchQuery,
         output: 'json',
@@ -171,7 +251,7 @@ ipcMain.handle('ia:getItems', async (event, { accessKey, secretKey, query }) => 
 
 ipcMain.handle('ia:getItemDetails', async (event, { identifier }) => {
   try {
-    const response = await axios.get(`https://archive.org/metadata/${identifier}`);
+    const response = await axiosInstance.get(`https://archive.org/metadata/${identifier}`);
     return { success: true, data: response.data };
   } catch (error) {
     return { success: false, error: error.message };
@@ -185,12 +265,11 @@ ipcMain.handle('ia:deleteFile', async (event, { identifier, fileName, accessKey,
       'x-archive-cascade-delete': '1'
     };
 
-    // Option pour garder l'ancienne version dans history/
     if (keepOldVersion) {
       headers['x-archive-keep-old-version'] = '1';
     }
 
-    const response = await axios.delete(
+    const response = await axiosInstance.delete(
       `https://s3.us.archive.org/${identifier}/${fileName}`,
       { headers }
     );
@@ -203,18 +282,47 @@ ipcMain.handle('ia:deleteFile', async (event, { identifier, fileName, accessKey,
 
 ipcMain.handle('ia:updateMetadata', async (event, { identifier, accessKey, secretKey, metadata }) => {
   try {
-    // Créer les opérations JSON Patch selon la doc officielle IA
-    // https://archive.org/developers/md-write.html
-    // Utiliser 'add' au lieu de 'replace' car certains champs peuvent ne pas exister
+    const existingMetadata = await axiosInstance.get(`https://archive.org/metadata/${identifier}`);
+    const currentMeta = existingMetadata.data?.metadata || {};
+    
     const patches = [];
     
-    if (metadata.title) patches.push({ op: 'add', path: '/title', value: metadata.title });
-    if (metadata.description) patches.push({ op: 'add', path: '/description', value: metadata.description });
-    if (metadata.subject) patches.push({ op: 'add', path: '/subject', value: metadata.subject });
-    if (metadata.creator) patches.push({ op: 'add', path: '/creator', value: metadata.creator });
-    if (metadata.mediatype) patches.push({ op: 'add', path: '/mediatype', value: metadata.mediatype });
+    if (metadata.title !== undefined) {
+      patches.push({ 
+        op: currentMeta.title ? 'replace' : 'add', 
+        path: '/title', 
+        value: metadata.title 
+      });
+    }
+    if (metadata.description !== undefined) {
+      patches.push({ 
+        op: currentMeta.description ? 'replace' : 'add', 
+        path: '/description', 
+        value: metadata.description 
+      });
+    }
+    if (metadata.subject !== undefined) {
+      patches.push({ 
+        op: currentMeta.subject ? 'replace' : 'add', 
+        path: '/subject', 
+        value: metadata.subject 
+      });
+    }
+    if (metadata.creator !== undefined) {
+      patches.push({ 
+        op: currentMeta.creator ? 'replace' : 'add', 
+        path: '/creator', 
+        value: metadata.creator 
+      });
+    }
+    if (metadata.mediatype !== undefined) {
+      patches.push({ 
+        op: currentMeta.mediatype ? 'replace' : 'add', 
+        path: '/mediatype', 
+        value: metadata.mediatype 
+      });
+    }
 
-    // Format URL-encoded selon la doc : -target, -patch, access, secret
     const formData = new URLSearchParams({
       '-target': 'metadata',
       '-patch': JSON.stringify(patches),
@@ -222,7 +330,7 @@ ipcMain.handle('ia:updateMetadata', async (event, { identifier, accessKey, secre
       'secret': secretKey
     });
 
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `https://archive.org/metadata/${identifier}`,
       formData.toString(),
       {
@@ -232,7 +340,6 @@ ipcMain.handle('ia:updateMetadata', async (event, { identifier, accessKey, secre
       }
     );
 
-    // Vérifier si la mise à jour a réussi
     if (response.data && response.data.success) {
       return { success: true, data: response.data };
     } else {
@@ -246,8 +353,7 @@ ipcMain.handle('ia:updateMetadata', async (event, { identifier, accessKey, secre
 
 ipcMain.handle('ia:deleteItem', async (event, { identifier, accessKey, secretKey }) => {
   try {
-    // Obtenir la liste de tous les fichiers de l'item
-    const metadataResponse = await axios.get(`https://archive.org/metadata/${identifier}`);
+    const metadataResponse = await axiosInstance.get(`https://archive.org/metadata/${identifier}`);
     
     if (!metadataResponse.data || !metadataResponse.data.files) {
       return { success: false, error: 'Unable to retrieve item files' };
@@ -255,16 +361,14 @@ ipcMain.handle('ia:deleteItem', async (event, { identifier, accessKey, secretKey
 
     const files = metadataResponse.data.files;
     const headers = {
-      'authorization': `LOW ${accessKey}:${secretKey}`,
+      'Authorization': `LOW ${accessKey}:${secretKey}`,
       'x-amz-auto-make-bucket': '1',
       'x-archive-meta01-collection': 'opensource',
       'x-archive-keep-old-version': '0'
     };
 
-    // Filtrer les fichiers système IA qui ne peuvent pas être supprimés
     const deletableFiles = files.filter(file => {
       if (!file.name) return false;
-      // Ignorer les fichiers de métadonnées IA (format Metadata ou fichiers système)
       if (file.format === 'Metadata') return false;
       if (file.name.endsWith('_files.xml')) return false;
       if (file.name.endsWith('_meta.xml')) return false;
@@ -273,14 +377,16 @@ ipcMain.handle('ia:deleteItem', async (event, { identifier, accessKey, secretKey
       return true;
     });
 
-    // Supprimer tous les fichiers supprimables un par un
     const errors = [];
+    const deletedFiles = [];
+    
     for (const file of deletableFiles) {
       try {
-        await axios.delete(
+        await axiosInstance.delete(
           `https://s3.us.archive.org/${identifier}/${file.name}`,
           { headers }
         );
+        deletedFiles.push(file.name);
       } catch (fileError) {
         errors.push(`${file.name}: ${fileError.message}`);
       }
@@ -288,13 +394,17 @@ ipcMain.handle('ia:deleteItem', async (event, { identifier, accessKey, secretKey
 
     if (errors.length > 0) {
       return { 
-        success: false, 
-        error: `Some files could not be deleted: ${errors.join(', ')}`,
-        partial: true
+        success: deletedFiles.length > 0,
+        error: errors.length === deletableFiles.length 
+          ? `Failed to delete all files: ${errors.join(', ')}`
+          : `Some files could not be deleted: ${errors.join(', ')}`,
+        partial: true,
+        deleted: deletedFiles.length,
+        failed: errors.length
       };
     }
 
-    return { success: true, data: { deleted: files.length } };
+    return { success: true, data: { deleted: deletedFiles.length } };
   } catch (error) {
     return { success: false, error: error.message };
   }

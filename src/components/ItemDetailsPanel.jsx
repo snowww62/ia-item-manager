@@ -89,10 +89,18 @@ Voulez-vous continuer ?`;
       });
 
       if (result.success) {
-        alert(t('details.deleteItemSuccess'));
+        if (result.partial) {
+          alert(`✅ Partially deleted (${result.deleted} files)\n⚠️ Some files failed:\n${result.error}`);
+        } else {
+          alert(t('details.deleteItemSuccess'));
+        }
         onBack();
       } else {
-        alert(t('details.deleteItemFailed') + ': ' + result.error);
+        if (result.partial) {
+          alert(`⚠️ Partial deletion completed\n✅ Deleted: ${result.deleted} files\n❌ Failed: ${result.failed} files\n\n${result.error}`);
+        } else {
+          alert(t('details.deleteItemFailed') + ': ' + result.error);
+        }
       }
     } catch (err) {
       alert('Error: ' + err.message);
@@ -275,8 +283,8 @@ Voulez-vous continuer ?`;
                     <label className="block text-sm font-medium text-slate-300 mb-2">Title</label>
                     <input
                       type="text"
-                      defaultValue={metadata.title}
-                      onChange={(e) => metadata.title = e.target.value}
+                      value={metadata.title}
+                      onChange={(e) => setMetadata(prev => ({ ...prev, title: e.target.value }))}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                     />
                   </div>
@@ -284,8 +292,8 @@ Voulez-vous continuer ?`;
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Description</label>
                     <textarea
-                      defaultValue={metadata.description}
-                      onChange={(e) => metadata.description = e.target.value}
+                      value={metadata.description}
+                      onChange={(e) => setMetadata(prev => ({ ...prev, description: e.target.value }))}
                       rows={4}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white resize-none"
                     />
@@ -296,8 +304,8 @@ Voulez-vous continuer ?`;
                       <label className="block text-sm font-medium text-slate-300 mb-2">Subject/Tags</label>
                       <input
                         type="text"
-                        defaultValue={metadata.subject}
-                        onChange={(e) => metadata.subject = e.target.value}
+                        value={metadata.subject}
+                        onChange={(e) => setMetadata(prev => ({ ...prev, subject: e.target.value }))}
                         placeholder="retro, games, dos"
                         className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                       />
@@ -307,8 +315,8 @@ Voulez-vous continuer ?`;
                       <label className="block text-sm font-medium text-slate-300 mb-2">Creator</label>
                       <input
                         type="text"
-                        defaultValue={metadata.creator}
-                        onChange={(e) => metadata.creator = e.target.value}
+                        value={metadata.creator}
+                        onChange={(e) => setMetadata(prev => ({ ...prev, creator: e.target.value }))}
                         className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                       />
                     </div>
@@ -317,8 +325,8 @@ Voulez-vous continuer ?`;
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Media Type</label>
                     <select
-                      defaultValue={metadata.mediatype}
-                      onChange={(e) => metadata.mediatype = e.target.value}
+                      value={metadata.mediatype}
+                      onChange={(e) => setMetadata(prev => ({ ...prev, mediatype: e.target.value }))}
                       className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
                     >
                       <option value="software">Software</option>

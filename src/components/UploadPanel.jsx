@@ -2,10 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Upload, File, X, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+const validateIdentifier = (id) => {
+  if (!id || id.length < 3) return 'Identifier must be at least 3 characters';
+  if (id.length > 100) return 'Identifier must be less than 100 characters';
+  if (!/^[a-z0-9][a-z0-9_-]*[a-z0-9]$/.test(id)) return 'Identifier must start and end with a letter or number';
+  return null;
+};
+
 const UploadPanel = ({ credentials, prefilledIdentifier }) => {
   const { t } = useLanguage();
   const [files, setFiles] = useState([]);
   const [identifier, setIdentifier] = useState(prefilledIdentifier || '');
+  const [identifierError, setIdentifierError] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [collection, setCollection] = useState('opensource_media');
@@ -13,7 +21,6 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
 
-  // Mettre à jour l'identifier si prefilledIdentifier change
   useEffect(() => {
     if (prefilledIdentifier) {
       setIdentifier(prefilledIdentifier);
@@ -28,6 +35,10 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
           [data.fileName]: { progress: data.progress, status: 'uploading' }
         }));
       });
+
+      return () => {
+        window.electronAPI.removeUploadProgressListener();
+      };
     }
   }, []);
 
@@ -50,20 +61,40 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
+  const handleIdentifierChange = (value) => {
+    const cleaned = value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    setIdentifier(cleaned);
+    
+    if (cleaned) {
+      const error = validateIdentifier(cleaned);
+      setIdentifierError(error);
+    } else {
+      setIdentifierError(null);
+    }
+  };
+
   const handleUpload = async () => {
     if (!identifier || files.length === 0 || !credentials.accessKey || !credentials.secretKey) {
       alert('Please fill in all required fields and configure your credentials in Settings');
       return;
     }
 
+    const validationError = validateIdentifier(identifier);
+    if (validationError) {
+      alert(validationError);
+      return;
+    }
+
     setUploading(true);
-    const newStatus = {};
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       try {
-        newStatus[file.name] = { progress: 0, status: 'uploading' };
-        setUploadStatus({ ...newStatus });
+        setUploadStatus(prev => ({
+          ...prev,
+          [file.name]: { progress: 0, status: 'uploading' }
+        }));
 
         const result = await window.electronAPI.uploadFile({
           identifier,
@@ -71,6 +102,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
           accessKey: credentials.accessKey,
           secretKey: credentials.secretKey,
           isExistingItem: !!prefilledIdentifier,
+          sizeHint: totalSize,
           metadata: {
             title,
             description,
@@ -80,7 +112,10 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
         });
 
         if (result.success) {
-          newStatus[file.name] = { progress: 100, status: 'success' };
+          setUploadStatus(prev => ({
+            ...prev,
+            [file.name]: { progress: 100, status: 'success' }
+          }));
         } else {
           const errorMsg = typeof result.error === 'string' ? result.error : JSON.stringify(result.error);
           
@@ -90,16 +125,20 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
             return;
           }
           
-          newStatus[file.name] = { progress: 0, status: 'error', error: errorMsg };
+          setUploadStatus(prev => ({
+            ...prev,
+            [file.name]: { progress: 0, status: 'error', error: errorMsg }
+          }));
         }
-        setUploadStatus({ ...newStatus });
 
         if (i < files.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 4000));
         }
       } catch (error) {
-        newStatus[file.name] = { progress: 0, status: 'error', error: error.message };
-        setUploadStatus({ ...newStatus });
+        setUploadStatus(prev => ({
+          ...prev,
+          [file.name]: { progress: 0, status: 'error', error: error.message }
+        }));
       }
     }
 
@@ -128,16 +167,21 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
                 <input
                   type="text"
                   value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                  onChange={(e) => handleIdentifierChange(e.target.value)}
                   placeholder={t('upload.identifierPlaceholder')}
                   disabled={!!prefilledIdentifier}
-                  className={`w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white ${prefilledIdentifier ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  className={`w-full px-4 py-2 bg-slate-900 border ${identifierError ? 'border-red-500' : 'border-slate-600'} rounded-lg focus:outline-none focus:ring-2 ${identifierError ? 'focus:ring-red-500' : 'focus:ring-blue-500'} text-white ${prefilledIdentifier ? 'opacity-70 cursor-not-allowed' : ''}`}
                 />
-                <p className="text-xs text-slate-400 mt-1">
-                  {prefilledIdentifier 
-                    ? t('upload.lockedIdentifier')
-                    : t('upload.identifierHelp')}
-                </p>
+                {identifierError && !prefilledIdentifier && (
+                  <p className="text-xs text-red-400 mt-1">❌ {identifierError}</p>
+                )}
+                {!identifierError && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    {prefilledIdentifier 
+                      ? t('upload.lockedIdentifier')
+                      : t('upload.identifierHelp')}
+                  </p>
+                )}
               </div>
 
               {!prefilledIdentifier && (

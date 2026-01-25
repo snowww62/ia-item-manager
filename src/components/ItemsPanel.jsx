@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Search, FolderOpen, ExternalLink, Loader, RefreshCw, Calendar, Eye } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
+const escapeLucene = (str) => {
+  const specialChars = /([+\-!(){}[\]^"~*?:\\/]|&&|\|\|)/g;
+  return str.replace(specialChars, '\\$1');
+};
+
 const ItemsPanel = ({ credentials, onSelectItem }) => {
   const { t } = useLanguage();
   const [items, setItems] = useState([]);
@@ -21,21 +26,18 @@ const ItemsPanel = ({ credentials, onSelectItem }) => {
     setDebugInfo('Recherche en cours...');
     
     try {
-      // Utiliser l'email IA sauvegardé si disponible
       const savedEmail = localStorage.getItem('app-iascreenname');
       let customQuery = '';
       
       if (savedEmail) {
         if (searchQuery) {
-          // Combiner la recherche avec le filtre uploader pour chercher uniquement dans les items de l'utilisateur
-          customQuery = `(title:(${searchQuery}) OR description:(${searchQuery})) AND uploader:"${savedEmail}"`;
+          const escapedQuery = escapeLucene(searchQuery);
+          customQuery = `(title:(${escapedQuery}) OR description:(${escapedQuery})) AND uploader:"${savedEmail}"`;
         } else {
-          // Sans recherche, afficher tous les items de l'utilisateur
           customQuery = `uploader:"${savedEmail}"`;
         }
       } else {
-        // Fallback si pas d'email configuré
-        customQuery = searchQuery || undefined;
+        customQuery = searchQuery ? escapeLucene(searchQuery) : undefined;
       }
       
       const result = await window.electronAPI.getItems({
