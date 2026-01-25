@@ -156,6 +156,10 @@ export const translations = {
         {
           question: "How do I download files?",
           answer: "In the item details, each file has a download button that opens the optimized download link on archive.org."
+        },
+        {
+          question: "I get a '503 SlowDown' or 'spam' error when uploading. What should I do?",
+          answer: "Internet Archive may flag your upload as spam. Solutions: 1) Remove all links from title and description (upload with minimal text, edit later), 2) Avoid words like 'roms', 'iso', 'dump' in identifier, 3) Use simple identifiers like 'my-collection-2025'. If it persists, contact info@archive.org with the full error message."
         }
       ]
     },
@@ -330,6 +334,10 @@ export const translations = {
         {
           question: "Comment télécharger des fichiers ?",
           answer: "Dans les détails de l'item, chaque fichier a un bouton de téléchargement qui ouvre le lien de téléchargement optimisé sur archive.org."
+        },
+        {
+          question: "J'ai une erreur '503 SlowDown' ou 'spam' lors de l'upload. Que faire ?",
+          answer: "Internet Archive peut bloquer votre upload comme spam. Solutions : 1) Retirez tous les liens du titre et description (uploadez avec texte minimal, éditez après), 2) Évitez les mots 'roms', 'iso', 'dump' dans l'identifiant, 3) Utilisez des identifiants simples comme 'ma-collection-2025'. Si ça persiste, contactez info@archive.org avec le message d'erreur complet."
         }
       ]
     },
@@ -455,6 +463,63 @@ export const translations = {
       portableText: '¡Puedes compartir esta app con otros! Cada usuario tendrá su propia configuración y credenciales.'
     },
 
+    // FAQ
+    faq: {
+      title: 'Preguntas Frecuentes',
+      subtitle: 'Preguntas comunes sobre el uso de IA Item Manager',
+      links: 'Enlaces Útiles',
+      linkApiKeys: 'Obtener claves API',
+      linkDocs: 'Documentación API Internet Archive',
+      linkGeneralFaq: 'FAQ General de Internet Archive',
+      madeBy: 'Hecho por Snow • Versión 1.0.0',
+      questions: [
+        {
+          question: "¿Cómo obtengo mis claves API de Internet Archive?",
+          answer: "Ve a https://archive.org/account/s3.php e inicia sesión con tu cuenta de Internet Archive. Encontrarás tu Access Key y Secret Key allí. Cópialas y pégalas en el panel de Ajustes."
+        },
+        {
+          question: "¿Qué es un identificador?",
+          answer: "Un identificador es un nombre único para tu item en Internet Archive. Debe estar en minúsculas, usar solo letras, números, guiones y guiones bajos. Ejemplo: mi-coleccion-retro-games"
+        },
+        {
+          question: "¿Puedo subir varios archivos a la vez?",
+          answer: "¡Sí! Haz clic en 'Seleccionar Archivos' y puedes elegir varios archivos para subir. Todos se subirán al mismo item."
+        },
+        {
+          question: "¿Cómo agrego archivos a un item existente?",
+          answer: "Ve a 'Mis Items', haz clic en el item al que quieres agregar archivos, luego haz clic en el botón '+ Add Files'. El identificador se bloqueará y tus nuevos archivos se agregarán a ese item."
+        },
+        {
+          question: "¿Por qué no puedo ver mis items?",
+          answer: "Asegúrate de haber ingresado tus claves API en Ajustes y tu email de Internet Archive en el campo 'IA Email'. La app busca items subidos por tu cuenta."
+        },
+        {
+          question: "¿Puedo eliminar items?",
+          answer: "Sí, pero Internet Archive mantiene algunos archivos del sistema (_meta.xml, etc.) que no se pueden eliminar. Tus archivos subidos serán eliminados. Para una eliminación completa, usa el sitio web de Internet Archive."
+        },
+        {
+          question: "¿Qué son los campos de metadatos?",
+          answer: "Los metadatos describen tu item: Title (nombre para mostrar), Description (contenido), Subject (etiquetas de búsqueda), Creator (autor) y Media Type (software, movies, audio, etc.)."
+        },
+        {
+          question: "¿Por qué mi subida tarda en aparecer?",
+          answer: "Después de subir, Internet Archive procesa los archivos (crea derivados, miniaturas, etc.). Esto puede tomar desde unos minutos hasta varias horas dependiendo del tamaño del archivo y la carga del servidor."
+        },
+        {
+          question: "¿Qué tipos de archivos puedo subir?",
+          answer: "Puedes subir cualquier tipo de archivo. Tipos comunes: ZIP, ISO, PDF, MP4, MP3, JPG, PNG, TXT, etc. Internet Archive los procesará automáticamente."
+        },
+        {
+          question: "¿Cómo descargo archivos?",
+          answer: "En los detalles del item, cada archivo tiene un botón de descarga que abre el enlace de descarga optimizado en archive.org."
+        },
+        {
+          question: "Recibo un error '503 SlowDown' o 'spam' al subir. ¿Qué debo hacer?",
+          answer: "Internet Archive puede marcar tu subida como spam. Soluciones: 1) Elimina todos los enlaces del título y descripción (sube con texto mínimo, edita después), 2) Evita palabras como 'roms', 'iso', 'dump' en el identificador, 3) Usa identificadores simples como 'mi-coleccion-2025'. Si persiste, contacta info@archive.org con el mensaje de error completo."
+        }
+      ]
+    },
+
     // Common
     common: {
       save: 'Guardar',
@@ -574,6 +639,63 @@ export const translations = {
       privacyText: 'Ihre Anmeldeinformationen werden lokal auf Ihrem Computer gespeichert und niemals an Drittserver gesendet, außer an die offizielle Internet Archive API.',
       portable: 'Portabel',
       portableText: 'Sie können diese App mit anderen teilen! Jeder Benutzer hat seine eigenen Einstellungen und Anmeldeinformationen.'
+    },
+
+    // FAQ
+    faq: {
+      title: 'Häufig Gestellte Fragen',
+      subtitle: 'Häufige Fragen zur Verwendung von IA Item Manager',
+      links: 'Nützliche Links',
+      linkApiKeys: 'API-Schlüssel erhalten',
+      linkDocs: 'Internet Archive API-Dokumentation',
+      linkGeneralFaq: 'Internet Archive Allgemeine FAQ',
+      madeBy: 'Erstellt von Snow • Version 1.0.0',
+      questions: [
+        {
+          question: "Wie erhalte ich meine Internet Archive API-Schlüssel?",
+          answer: "Gehen Sie zu https://archive.org/account/s3.php und melden Sie sich mit Ihrem Internet Archive-Konto an. Dort finden Sie Ihren Access Key und Secret Key. Kopieren Sie sie und fügen Sie sie in das Einstellungsfenster ein."
+        },
+        {
+          question: "Was ist eine Kennung?",
+          answer: "Eine Kennung ist ein eindeutiger Name für Ihr Element auf Internet Archive. Sie muss in Kleinbuchstaben sein und darf nur Buchstaben, Zahlen, Bindestriche und Unterstriche verwenden. Beispiel: meine-retro-games-sammlung"
+        },
+        {
+          question: "Kann ich mehrere Dateien gleichzeitig hochladen?",
+          answer: "Ja! Klicken Sie auf 'Dateien auswählen' und Sie können mehrere Dateien zum Hochladen auswählen. Sie werden alle zum selben Element hochgeladen."
+        },
+        {
+          question: "Wie füge ich Dateien zu einem vorhandenen Element hinzu?",
+          answer: "Gehen Sie zu 'Meine Elemente', klicken Sie auf das Element, zu dem Sie Dateien hinzufügen möchten, und klicken Sie dann auf die Schaltfläche '+ Add Files'. Die Kennung wird gesperrt und Ihre neuen Dateien werden zu diesem Element hinzugefügt."
+        },
+        {
+          question: "Warum kann ich meine Elemente nicht sehen?",
+          answer: "Stellen Sie sicher, dass Sie Ihre API-Schlüssel in den Einstellungen eingegeben haben und Ihre Internet Archive-E-Mail im Feld 'IA Email'. Die App sucht nach Elementen, die von Ihrem Konto hochgeladen wurden."
+        },
+        {
+          question: "Kann ich Elemente löschen?",
+          answer: "Ja, aber Internet Archive behält einige Systemdateien (_meta.xml usw.), die nicht gelöscht werden können. Ihre hochgeladenen Dateien werden entfernt. Für eine vollständige Löschung verwenden Sie die Internet Archive-Website."
+        },
+        {
+          question: "Was sind Metadatenfelder?",
+          answer: "Metadaten beschreiben Ihr Element: Title (Anzeigename), Description (Inhalt), Subject (Suchtags), Creator (Autor) und Media Type (software, movies, audio usw.)."
+        },
+        {
+          question: "Warum dauert es, bis mein Upload angezeigt wird?",
+          answer: "Nach dem Hochladen verarbeitet Internet Archive die Dateien (erstellt Derivate, Miniaturansichten usw.). Dies kann je nach Dateigröße und Serverlast einige Minuten bis mehrere Stunden dauern."
+        },
+        {
+          question: "Welche Dateitypen kann ich hochladen?",
+          answer: "Sie können jeden Dateityp hochladen. Gängige Typen: ZIP, ISO, PDF, MP4, MP3, JPG, PNG, TXT usw. Internet Archive verarbeitet sie automatisch."
+        },
+        {
+          question: "Wie lade ich Dateien herunter?",
+          answer: "In den Elementdetails hat jede Datei eine Download-Schaltfläche, die den optimierten Download-Link auf archive.org öffnet."
+        },
+        {
+          question: "Ich erhalte einen '503 SlowDown'- oder 'Spam'-Fehler beim Hochladen. Was soll ich tun?",
+          answer: "Internet Archive könnte Ihren Upload als Spam markieren. Lösungen: 1) Entfernen Sie alle Links aus Titel und Beschreibung (laden Sie mit minimalem Text hoch, bearbeiten Sie später), 2) Vermeiden Sie Wörter wie 'roms', 'iso', 'dump' in der Kennung, 3) Verwenden Sie einfache Kennungen wie 'meine-sammlung-2025'. Wenn es weiterhin besteht, kontaktieren Sie info@archive.org mit der vollständigen Fehlermeldung."
+        }
+      ]
     },
 
     // Common
