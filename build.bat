@@ -35,10 +35,10 @@ echo ================================================
 echo    BUILD COMPLETED SUCCESSFULLY!
 echo ================================================
 echo.
-echo Your executable files are in the "release" folder:
-echo   - ArchiveVault-Portable.exe (double-click to run, no install needed)
-echo   - ArchiveVault Setup.exe (installer version)
+echo Your executable files are in the "build_output" folder:
+echo   - IA-Item-Manager-Portable.exe (double-click to run, no install needed)
+echo   - IA Item Manager Setup 1.0.0.exe (installer version)
 echo.
-echo You can share ArchiveVault-Portable.exe with others!
+echo You can share IA-Item-Manager-Portable.exe with others!
 echo.
 pause

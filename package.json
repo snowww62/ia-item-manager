@@ -68,7 +68,7 @@
       "artifactName": "IA-Item-Manager-Portable.exe"
     },
     "directories": {
-      "output": "release"
+      "output": "build_output"
     }
   }
 }
