@@ -1,6 +1,6 @@
 {
   "name": "ia-item-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A beautiful desktop app to manage your Internet Archive items and files",
   "main": "electron/main.js",
   "scripts": {
