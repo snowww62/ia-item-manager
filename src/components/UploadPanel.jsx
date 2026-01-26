@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Upload, File, X, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Upload, File, X, CheckCircle, AlertCircle, Loader, Info } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+
+const debounce = (func, wait) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+};
 
 const validateIdentifier = (id) => {
   if (!id || id.length < 3) return 'Identifier must be at least 3 characters';
   if (id.length > 100) return 'Identifier must be less than 100 characters';
-  if (!/^[a-z0-9][a-z0-9_-]*[a-z0-9]$/.test(id)) return 'Identifier must start and end with a letter or number';
+  if (!/^[a-z0-9][a-z0-9_-]*[a-z0-9]$/.test(id) && id.length > 1) return 'Identifier must start and end with a letter or number';
   return null;
 };
 
@@ -13,13 +21,11 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
   const { t } = useLanguage();
   const [files, setFiles] = useState([]);
   const [identifier, setIdentifier] = useState(prefilledIdentifier || '');
-  const [identifierError, setIdentifierError] = useState(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [collection, setCollection] = useState('opensource_media');
-  const [mediatype, setMediatype] = useState('data');
+  const [targetFolder, setTargetFolder] = useState('');
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
+
+  const userEmail = localStorage.getItem('app-iascreenname') || '';
 
   useEffect(() => {
     if (prefilledIdentifier) {
@@ -42,6 +48,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
     }
   }, []);
 
+
   const handleSelectFiles = async () => {
     const selectedFiles = await window.electronAPI.openMultipleFilesDialog();
     if (selectedFiles && selectedFiles.length > 0) {
@@ -61,27 +68,10 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const handleIdentifierChange = (value) => {
-    const cleaned = value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    setIdentifier(cleaned);
-    
-    if (cleaned) {
-      const error = validateIdentifier(cleaned);
-      setIdentifierError(error);
-    } else {
-      setIdentifierError(null);
-    }
-  };
 
   const handleUpload = async () => {
     if (!identifier || files.length === 0 || !credentials.accessKey || !credentials.secretKey) {
-      alert('Please fill in all required fields and configure your credentials in Settings');
-      return;
-    }
-
-    const validationError = validateIdentifier(identifier);
-    if (validationError) {
-      alert(validationError);
+      alert(t('upload.fillRequired'));
       return;
     }
 
@@ -99,16 +89,11 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
         const result = await window.electronAPI.uploadFile({
           identifier,
           filePath: file.path,
+          targetFolder: targetFolder.trim(),
           accessKey: credentials.accessKey,
           secretKey: credentials.secretKey,
-          isExistingItem: !!prefilledIdentifier,
-          sizeHint: totalSize,
-          metadata: {
-            title,
-            description,
-            collection,
-            mediatype
-          }
+          isExistingItem: true,
+          sizeHint: totalSize
         });
 
         if (result.success) {
@@ -119,12 +104,6 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
         } else {
           const errorMsg = typeof result.error === 'string' ? result.error : JSON.stringify(result.error);
           
-          if (errorMsg.includes('SlowDown') || errorMsg.includes('spam')) {
-            alert(t('upload.spamErrorTitle') + '\n\n' + t('upload.spamErrorMessage'));
-            setUploading(false);
-            return;
-          }
-          
           setUploadStatus(prev => ({
             ...prev,
             [file.name]: { progress: 0, status: 'error', error: errorMsg }
@@ -132,7 +111,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
         }
 
         if (i < files.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 4000));
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       } catch (error) {
         setUploadStatus(prev => ({
@@ -144,6 +123,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
 
     setUploading(false);
   };
+
 
   return (
     <div className="h-full flex flex-col bg-slate-900">
@@ -167,105 +147,30 @@ const UploadPanel = ({ credentials, prefilledIdentifier }) => {
                 <input
                   type="text"
                   value={identifier}
-                  onChange={(e) => handleIdentifierChange(e.target.value)}
-                  placeholder={t('upload.identifierPlaceholder')}
-                  disabled={!!prefilledIdentifier}
-                  className={`w-full px-4 py-2 bg-slate-900 border ${identifierError ? 'border-red-500' : 'border-slate-600'} rounded-lg focus:outline-none focus:ring-2 ${identifierError ? 'focus:ring-red-500' : 'focus:ring-blue-500'} text-white ${prefilledIdentifier ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled
+                  className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none text-white opacity-70 cursor-not-allowed"
                 />
-                {identifierError && !prefilledIdentifier && (
-                  <p className="text-xs text-red-400 mt-1">❌ {identifierError}</p>
-                )}
-                {!identifierError && (
-                  <p className="text-xs text-slate-400 mt-1">
-                    {prefilledIdentifier 
-                      ? t('upload.lockedIdentifier')
-                      : t('upload.identifierHelp')}
-                  </p>
-                )}
+                <p className="text-xs text-slate-400 mt-1">
+                  🔒 {t('upload.existingItemOnly')}
+                </p>
               </div>
 
-              {!prefilledIdentifier && (
-                <>
-                  <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-yellow-200 font-semibold mb-2">
-                      {t('upload.newItemWarningTitle')}
-                    </p>
-                    <p className="text-xs text-yellow-100 mb-2">
-                      {t('upload.newItemWarningText')}
-                    </p>
-                    <p className="text-xs text-yellow-100 font-semibold">
-                      {t('upload.newItemWarningSolution')}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      {t('upload.title')}
-                    </label>
-                    <input
-                      type="text"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder={t('upload.titlePlaceholder')}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-                    />
-                  </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  📁 Target Folder (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={targetFolder}
+                  onChange={(e) => setTargetFolder(e.target.value)}
+                  placeholder="roms/intellivision/ or manuals/ or leave empty"
+                  className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-mono"
+                />
+                <p className="text-xs text-slate-400 mt-1">
+                  💡 Organize files in folders. Example: <span className="text-blue-300">roms/intellivision/</span> will create folders automatically.
+                </p>
+              </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      {t('upload.description')}
-                    </label>
-                    <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={t('upload.descriptionPlaceholder')}
-                      rows={3}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Collection * (Required)
-                    </label>
-                    <select
-                      value={collection}
-                      onChange={(e) => {
-                        const selectedCollection = e.target.value;
-                        setCollection(selectedCollection);
-                        
-                        const mediatypeMap = {
-                          'opensource_media': 'data',
-                          'opensource_movies': 'movies',
-                          'opensource': 'texts',
-                          'opensource_audio': 'audio',
-                          'opensource_image': 'image',
-                          'open_source_software': 'software'
-                        };
-                        setMediatype(mediatypeMap[selectedCollection] || 'data');
-                      }}
-                      className="w-full px-4 py-2 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-                    >
-                      <option value="opensource_media">Community Data</option>
-                      <option value="opensource_movies">Community Movies</option>
-                      <option value="opensource">Community Texts</option>
-                      <option value="opensource_audio">Community Audio</option>
-                      <option value="opensource_image">Community Image</option>
-                      <option value="open_source_software">Community Software</option>
-                    </select>
-                    <p className="text-xs text-slate-400 mt-1">
-                      ✅ Required to prevent spam detection. Mediatype will be set automatically.
-                    </p>
-                  </div>
-                </>
-              )}
-              
-              {prefilledIdentifier && (
-                <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
-                  <p className="text-sm text-blue-200">
-                    {t('upload.existingItemNote')}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 

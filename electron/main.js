@@ -109,8 +109,8 @@ ipcMain.handle('credentials:save', async (event, { accessKey, secretKey }) => {
     return { 
       success: true, 
       encrypted: {
-        accessKey: encryptedAccess.toString('base64'),
-        secretKey: encryptedSecret.toString('base64')
+        encryptedAccessKey: encryptedAccess.toString('base64'),
+        encryptedSecretKey: encryptedSecret.toString('base64')
       }
     };
   } catch (error) {
@@ -157,10 +157,18 @@ ipcMain.handle('ia:checkLimits', async (event, { accessKey, identifier }) => {
   }
 });
 
-ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, secretKey, metadata, isExistingItem, sizeHint }) => {
+ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, accessKey, secretKey, metadata, isExistingItem, sizeHint }) => {
   try {
     const fileName = path.basename(filePath);
     const fileBuffer = fs.readFileSync(filePath);
+
+    // Construct target path with optional folder
+    let targetPath = fileName;
+    if (targetFolder && targetFolder.trim()) {
+      const cleanFolder = targetFolder.trim().replace(/\\/g, '/');
+      const folderWithSlash = cleanFolder.endsWith('/') ? cleanFolder : cleanFolder + '/';
+      targetPath = folderWithSlash + fileName;
+    }
 
     const headers = {
       'Authorization': `LOW ${accessKey}:${secretKey}`,
@@ -188,10 +196,13 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, accessKey, sec
       if (metadata.queueDerive !== undefined) headers['x-archive-queue-derive'] = metadata.queueDerive;
     }
 
+    // Encode each path segment separately to preserve slashes
+    const encodedPath = targetPath.split('/').map(segment => encodeURIComponent(segment)).join('/');
+
     const response = await retryOperation(async () => {
       return await axiosInstance({
         method: 'put',
-        url: `https://s3.us.archive.org/${identifier}/${encodeURIComponent(fileName)}`,
+        url: `https://s3.us.archive.org/${identifier}/${encodedPath}`,
         data: fileBuffer,
         headers: headers,
         onUploadProgress: (progressEvent) => {
@@ -254,6 +265,32 @@ ipcMain.handle('ia:getItemDetails', async (event, { identifier }) => {
     const response = await axiosInstance.get(`https://archive.org/metadata/${identifier}`);
     return { success: true, data: response.data };
   } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('ia:checkIdentifier', async (event, { identifier, userEmail }) => {
+  try {
+    const response = await axiosInstance.get(`https://archive.org/metadata/${identifier}`);
+    
+    if (response.data && response.data.metadata) {
+      const uploader = response.data.metadata.uploader;
+      const isOwner = userEmail && uploader && uploader.toLowerCase() === userEmail.toLowerCase();
+      
+      return { 
+        success: true, 
+        exists: true, 
+        isOwner: isOwner,
+        uploader: uploader,
+        title: response.data.metadata.title || identifier
+      };
+    }
+    
+    return { success: true, exists: false };
+  } catch (error) {
+    if (error.response?.status === 404) {
+      return { success: true, exists: false };
+    }
     return { success: false, error: error.message };
   }
 });

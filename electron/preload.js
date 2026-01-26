@@ -4,6 +4,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   uploadFile: (data) => ipcRenderer.invoke('ia:upload', data),
   getItems: (data) => ipcRenderer.invoke('ia:getItems', data),
   getItemDetails: (data) => ipcRenderer.invoke('ia:getItemDetails', data),
+  checkIdentifier: (data) => ipcRenderer.invoke('ia:checkIdentifier', data),
   deleteFile: (data) => ipcRenderer.invoke('ia:deleteFile', data),
   deleteItem: (data) => ipcRenderer.invoke('ia:deleteItem', data),
   updateMetadata: (data) => ipcRenderer.invoke('ia:updateMetadata', data),

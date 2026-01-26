@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Key, Save, ExternalLink, Info, Globe, Palette, User, CheckCircle } from 'lucide-react';
+import { Settings, Key, Save, ExternalLink, Info, Globe, Palette, User, CheckCircle, Clipboard } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const SettingsPanel = ({ credentials, setCredentials }) => {
@@ -19,6 +19,24 @@ const SettingsPanel = ({ credentials, setCredentials }) => {
     localStorage.setItem('app-autorefresh', autoRefresh.toString());
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const handlePasteAccessKey = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setLocalCredentials({ ...localCredentials, accessKey: text.trim() });
+    } catch (err) {
+      console.error('Failed to read clipboard:', err);
+    }
+  };
+
+  const handlePasteSecretKey = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setLocalCredentials({ ...localCredentials, secretKey: text.trim() });
+    } catch (err) {
+      console.error('Failed to read clipboard:', err);
+    }
   };
 
   return (
@@ -105,26 +123,46 @@ const SettingsPanel = ({ credentials, setCredentials }) => {
                 <label className="block text-sm font-medium text-slate-300 mb-2">
                   {t('settings.accessKey')}
                 </label>
-                <input
-                  type="text"
-                  value={localCredentials.accessKey}
-                  onChange={(e) => setLocalCredentials({ ...localCredentials, accessKey: e.target.value })}
-                  placeholder={t('settings.accessKeyPlaceholder')}
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-mono"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={localCredentials.accessKey}
+                    onChange={(e) => setLocalCredentials({ ...localCredentials, accessKey: e.target.value })}
+                    placeholder={t('settings.accessKeyPlaceholder')}
+                    className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-mono"
+                  />
+                  <button
+                    onClick={handlePasteAccessKey}
+                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    title="Paste from clipboard"
+                  >
+                    <Clipboard className="w-4 h-4" />
+                    Paste
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
                   {t('settings.secretKey')}
                 </label>
-                <input
-                  type="password"
-                  value={localCredentials.secretKey}
-                  onChange={(e) => setLocalCredentials({ ...localCredentials, secretKey: e.target.value })}
-                  placeholder={t('settings.secretKeyPlaceholder')}
-                  className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-mono"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    value={localCredentials.secretKey}
+                    onChange={(e) => setLocalCredentials({ ...localCredentials, secretKey: e.target.value })}
+                    placeholder={t('settings.secretKeyPlaceholder')}
+                    className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-mono"
+                  />
+                  <button
+                    onClick={handlePasteSecretKey}
+                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    title="Paste from clipboard"
+                  >
+                    <Clipboard className="w-4 h-4" />
+                    Paste
+                  </button>
+                </div>
               </div>
             </div>
           </div>
