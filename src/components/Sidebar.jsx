@@ -1,60 +1,83 @@
 import React from 'react';
-import { Archive, Upload, FolderOpen, Settings, HelpCircle } from 'lucide-react';
+import {
+  FolderOpen, UploadCloud, Sparkles, HelpCircle, Settings,
+  PanelLeftClose, PanelLeftOpen, Archive,
+} from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const Sidebar = ({ currentView, setCurrentView }) => {
+const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected, version }) => {
   const { t } = useLanguage();
-  
-  const menuItems = [
-    { id: 'items', icon: FolderOpen, label: t('sidebar.myItems') },
-    { id: 'upload', icon: Upload, label: t('sidebar.upload') },
-    { id: 'faq', icon: HelpCircle, label: t('sidebar.faq') },
-    { id: 'settings', icon: Settings, label: t('sidebar.settings') },
+
+  const items = [
+    { id: 'items', icon: FolderOpen, label: t('nav.items') },
+    { id: 'upload', icon: UploadCloud, label: t('nav.upload') },
+    { id: 'create', icon: Sparkles, label: t('nav.create') },
+    { id: 'faq', icon: HelpCircle, label: t('nav.faq') },
+    { id: 'settings', icon: Settings, label: t('nav.settings') },
   ];
 
   return (
-    <aside className="w-64 bg-slate-800 border-r border-slate-700 flex flex-col">
-      <div className="p-6 border-b border-slate-700">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-            <Archive className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold">IA Item Manager</h1>
-            <p className="text-xs text-slate-400">by Snow</p>
-          </div>
+    <aside
+      className={`relative z-10 shrink-0 flex flex-col bg-surface/70 backdrop-blur-xl border-r border-line transition-[width] duration-200 ${
+        collapsed ? 'w-[68px]' : 'w-60'
+      }`}
+    >
+      {/* Brand */}
+      <div className={`flex items-center gap-3 h-[68px] px-4 border-b border-line ${collapsed ? 'justify-center' : ''}`}>
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand to-accent flex items-center justify-center shadow-glow shrink-0">
+          <Archive className="w-5 h-5 text-white" />
         </div>
+        {!collapsed && (
+          <div className="min-w-0">
+            <p className="font-semibold text-ink leading-tight truncate">{t('app.name')}</p>
+            <p className="text-[11px] text-ink-faint truncate">{t('app.tagline')}</p>
+          </div>
+        )}
       </div>
 
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <li key={item.id}>
-                <button
-                  onClick={() => setCurrentView(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                    currentView === item.id
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/50'
-                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+      {/* Nav */}
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        {items.map(({ id, icon: Icon, label }) => {
+          const active = currentView === id;
+          return (
+            <button
+              key={id}
+              onClick={() => setView(id)}
+              title={collapsed ? label : undefined}
+              className={`group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-all ${
+                active
+                  ? 'bg-brand-soft text-ink'
+                  : 'text-ink-muted hover:bg-surface-hover hover:text-ink'
+              } ${collapsed ? 'justify-center' : ''}`}
+            >
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-full bg-brand" />
+              )}
+              <Icon className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-brand' : ''}`} />
+              {!collapsed && <span className="truncate">{label}</span>}
+            </button>
+          );
+        })}
       </nav>
 
-      <div className="p-4 border-t border-slate-700">
-        <div className="bg-slate-700/50 rounded-lg p-3">
-          <p className="text-xs text-slate-400 text-center">
-            {t('sidebar.version')} 1.0.0
-          </p>
+      {/* Footer */}
+      <div className="p-3 border-t border-line space-y-2">
+        <div className={`flex items-center gap-2 px-2 text-[11px] text-ink-faint ${collapsed ? 'justify-center' : ''}`}>
+          <span
+            className={`w-2 h-2 rounded-full shrink-0 ${connected ? 'bg-ok shadow-[0_0_8px] shadow-ok/60' : 'bg-ink-faint'}`}
+          />
+          {!collapsed && <span>{connected ? 'archive.org' : t('items.credentialsError')}</span>}
         </div>
+        <button
+          onClick={onToggleCollapse}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-sm text-xs text-ink-faint hover:bg-surface-hover hover:text-ink transition-colors ${
+            collapsed ? 'justify-center' : ''
+          }`}
+        >
+          {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+          {!collapsed && <span>{t('nav.collapse')}</span>}
+          {!collapsed && version && <span className="ml-auto opacity-60">v{version}</span>}
+        </button>
       </div>
     </aside>
   );

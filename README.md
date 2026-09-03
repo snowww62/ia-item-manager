@@ -1,88 +1,54 @@
 # IA Item Manager
 
-A beautiful desktop application to **manage and bulk upload files** to your existing Internet Archive items with ease.
+A modern desktop app to **manage your Internet Archive items** and **bulk‑upload files** to them.
 
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white)
 ![Electron](https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)
 
-## ✨ Features
+## ✨ What it does
 
-- 📤 **Bulk Upload** - Upload multiple files to existing items with progress tracking
-- 📁 **Folder Organization** - Create folder structures within items (e.g., `roms/intellivision/game.zip`)
-- 🔍 **Item Browser** - View and search all your archived items
-- ➕ **Add Files to Items** - Easily add hundreds of files to your collections at once
-- 📝 **Edit Metadata** - Update item metadata (title, description, subject, creator, mediatype)
-- ⬇️ **Download** - Direct download links for all your files
-- 🗑️ **Delete** - Remove files and items (keeps old versions in history)
-- 🎨 **Modern UI** - Elegant dark mode interface
-- 🌍 **Multi-language** - English, French, Spanish, and German support
+- **Item browser** — thumbnails, sort (date / title / views), media‑type filter, grid or list view, pagination, multi‑select.
+- **Bulk upload** — drag & drop, per‑file progress and speed, retry failed, optional destination folders (`roms/snes/…`), toggle derivation.
+- **Item details** — overview / files / metadata / raw tabs, per‑file source badges, copy download links, whole‑item ZIP download.
+- **archive.org integration** — connection test (shows your screen name), processing/task status, one‑click re‑derivation, full metadata editor (title, description, subject, creator, date, license, language, media type).
+- **New item** — create an item straight from the app (advanced, gated behind a spam‑risk warning).
+- **Polish** — dark modern UI, in‑app toasts and confirm dialogs (no more browser `alert()`), collapsible sidebar, keyboard shortcuts (`Ctrl/⌘ + 1–5`, `Ctrl/⌘ + K`).
+- **4 languages** — English, Français, Español, Deutsch.
 
-## 🎯 What This App Is For
+## 🔐 Security
 
-**IA Item Manager** is designed for **bulk file management** on existing Internet Archive items:
-- ✅ Upload **hundreds of files** to an existing item in one go
-- ✅ Organize files in **folders** within items
-- ✅ Manage and edit your **existing items**
-- ✅ **Safe from spam detection** - no new item creation
+- API keys are encrypted at rest with your OS keychain (Electron `safeStorage`).
+- Nothing is sent anywhere except the official Internet Archive HTTPS APIs.
+- External links open in your real browser, never inside the app.
 
-**Note:** To create your **first item**, use the [Internet Archive website](https://archive.org/upload/). After that, use this app to manage and upload files to it!
+## 🚀 Quick start
 
-## 📦 Download
-
-Get the latest release from the [Releases](https://github.com/snowww62/ia-item-manager/releases) page.
-
-**Portable version recommended** - Just download `IA-Item-Manager-Portable.exe` and run it. No installation required!
-
-## 🚀 Quick Start
-
-1. **Create your first item** on [archive.org/upload](https://archive.org/upload/) (one-time only)
-2. **Get your API keys** from [archive.org/account/s3.php](https://archive.org/account/s3.php)
-3. **Launch the app** and go to Settings
-4. **Enter your credentials** (Access Key & Secret Key)
-5. **Enter your Internet Archive email** (for searching your items)
-6. **Go to "My Items"** tab → Select an item → Click **"Add Files"**
-7. **Upload in bulk!** Add hundreds of files to your item
+1. Create your first item on [archive.org/upload](https://archive.org/upload/) (one‑time — or use the in‑app **New item** panel).
+2. Get your keys at [archive.org/account/s3.php](https://archive.org/account/s3.php).
+3. Launch IA Item Manager → **Settings** → paste your Access Key & Secret Key, add your IA email, hit **Test connection**.
+4. **My items** → pick an item → **Add files** → drop files → upload.
 
 ## 🛠️ Development
-
-### Prerequisites
-
-- Node.js 16+
-- npm
-
-### Setup
 
 ```bash
 npm install
 npm run dev
 ```
 
-### Build
+## 📦 Build
 
 ```bash
 npm run build
 npm run package
 ```
 
-Executable will be generated in the `build_output/` folder.
-
-## 🔐 Security
-
-- Your credentials are stored **locally** in your application
-- No data is sent to third-party servers
-- All communication is with official Internet Archive APIs via HTTPS
+Executables land in `build_output/` (`IA-Item-Manager-Portable.exe` and the installer).
 
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) for details
-
-## 🙏 Credits
-
-- Built with [Electron](https://www.electronjs.org/) and [React](https://reactjs.org/)
-- Uses the [Internet Archive API](https://archive.org/developers/)
-- Icons by [Lucide](https://lucide.dev/)
+MIT — see [LICENSE](LICENSE).
 
 ---
 
-**Made by Snow**
+**Made by Snow** · Built with Electron, React, Vite, Tailwind CSS and [Lucide](https://lucide.dev/) icons.

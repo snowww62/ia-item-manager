@@ -1,7 +1,7 @@
 {
   "name": "ia-item-manager",
-  "version": "1.0.1",
-  "description": "A beautiful desktop app to manage your Internet Archive items and files",
+  "version": "2.0.0",
+  "description": "A modern desktop app to manage your Internet Archive items and bulk-upload files",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
@@ -10,7 +10,7 @@
     "build": "vite build",
     "package": "electron-builder"
   },
-  "keywords": ["internet-archive", "electron", "react", "file-manager"],
+  "keywords": ["internet-archive", "electron", "react", "file-manager", "archive-org"],
   "author": "Snow",
   "license": "MIT",
   "dependencies": {

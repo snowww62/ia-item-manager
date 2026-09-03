@@ -1,560 +1,565 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Item Manager - Manage Your Internet Archive Collection</title>
-    <meta name="description" content="A beautiful desktop application to manage your Internet Archive items and files with ease">
-    <link rel="icon" type="image/png" href="icon.png">
-    <script>
-        // Translations
-        const translations = {
-            en: {
-                title: "IA Item Manager",
-                subtitle: "Manage your Internet Archive collection with style",
-                downloadBtn: "Download Now",
-                githubBtn: "View on GitHub",
-                featuresTitle: "Features",
-                features: [
-                    { icon: "📤", title: "Upload Files", desc: "Upload files to Internet Archive with real-time progress tracking and support for multiple files" },
-                    { icon: "📁", title: "Manage Items", desc: "View, browse, and organize all your archived items with a beautiful modern interface" },
-                    { icon: "🔍", title: "Powerful Search", desc: "Quickly find your files with smart search that filters only your items" },
-                    { icon: "📝", title: "Edit Metadata", desc: "Update item metadata including title, description, subject, creator, and media type" },
-                    { icon: "➕", title: "Add to Collections", desc: "Easily add new files to your existing items and collections" },
-                    { icon: "🌍", title: "Multi-Language", desc: "Full support for English and French with more languages coming soon" },
-                    { icon: "🎨", title: "Modern UI", desc: "Elegant dark mode interface with smooth animations and intuitive navigation" },
-                    { icon: "🔐", title: "Secure & Private", desc: "Your credentials are stored locally and never sent to third-party servers" },
-                    { icon: "⬇️", title: "Direct Downloads", desc: "Optimized download links for all your files on Internet Archive" }
-                ],
-                downloadTitle: "Download",
-                recommended: "Recommended",
-                portableTitle: "Portable Version",
-                portableDesc: "No installation required. Just download and run!",
-                downloadPortable: "Download Portable",
-                installerTitle: "Installer Version",
-                installerDesc: "Classic Windows installer with Start Menu shortcuts",
-                downloadInstaller: "Download Installer",
-                requirements: "Windows 10/11 (64-bit) • Requires Internet Archive account",
-                madeBy: "Made by",
-                links: "Report Bug"
-            },
-            fr: {
-                title: "IA Item Manager",
-                subtitle: "Gérez votre collection Internet Archive avec style",
-                downloadBtn: "Télécharger",
-                githubBtn: "Voir sur GitHub",
-                featuresTitle: "Fonctionnalités",
-                features: [
-                    { icon: "📤", title: "Upload de fichiers", desc: "Uploadez vos fichiers sur Internet Archive avec suivi en temps réel et support de fichiers multiples" },
-                    { icon: "📁", title: "Gestion des items", desc: "Visualisez, parcourez et organisez tous vos items archivés avec une interface moderne" },
-                    { icon: "🔍", title: "Recherche puissante", desc: "Trouvez rapidement vos fichiers avec une recherche intelligente qui filtre uniquement vos items" },
-                    { icon: "📝", title: "Édition métadonnées", desc: "Mettez à jour les métadonnées incluant titre, description, sujet, créateur et type de média" },
-                    { icon: "➕", title: "Ajout aux collections", desc: "Ajoutez facilement de nouveaux fichiers à vos items et collections existants" },
-                    { icon: "🌍", title: "Multi-langue", desc: "Support complet pour l'anglais et le français avec plus de langues à venir" },
-                    { icon: "🎨", title: "Interface moderne", desc: "Interface élégante en mode sombre avec animations fluides et navigation intuitive" },
-                    { icon: "🔐", title: "Sécurisé & Privé", desc: "Vos identifiants sont stockés localement et jamais envoyés à des serveurs tiers" },
-                    { icon: "⬇️", title: "Téléchargements directs", desc: "Liens de téléchargement optimisés pour tous vos fichiers sur Internet Archive" }
-                ],
-                downloadTitle: "Téléchargement",
-                recommended: "Recommandé",
-                portableTitle: "Version Portable",
-                portableDesc: "Aucune installation requise. Téléchargez et lancez !",
-                downloadPortable: "Télécharger Portable",
-                installerTitle: "Version Installeur",
-                installerDesc: "Installeur Windows classique avec raccourcis menu Démarrer",
-                downloadInstaller: "Télécharger Installeur",
-                requirements: "Windows 10/11 (64-bit) • Nécessite un compte Internet Archive",
-                madeBy: "Créé par",
-                links: "Signaler un bug"
-            },
-            es: {
-                title: "IA Item Manager",
-                subtitle: "Gestiona tu colección de Internet Archive con estilo",
-                downloadBtn: "Descargar",
-                githubBtn: "Ver en GitHub",
-                featuresTitle: "Características",
-                features: [
-                    { icon: "📤", title: "Subir archivos", desc: "Sube archivos a Internet Archive con seguimiento en tiempo real y soporte para múltiples archivos" },
-                    { icon: "📁", title: "Gestionar items", desc: "Visualiza, navega y organiza todos tus items archivados con una interfaz moderna" },
-                    { icon: "🔍", title: "Búsqueda potente", desc: "Encuentra rápidamente tus archivos con búsqueda inteligente que filtra solo tus items" },
-                    { icon: "📝", title: "Editar metadatos", desc: "Actualiza metadatos incluyendo título, descripción, tema, creador y tipo de medio" },
-                    { icon: "➕", title: "Añadir a colecciones", desc: "Añade fácilmente nuevos archivos a tus items y colecciones existentes" },
-                    { icon: "🌍", title: "Multi-idioma", desc: "Soporte completo para inglés, francés, español y alemán" },
-                    { icon: "🎨", title: "Interfaz moderna", desc: "Interfaz elegante en modo oscuro con animaciones fluidas y navegación intuitiva" },
-                    { icon: "🔐", title: "Seguro y Privado", desc: "Tus credenciales se almacenan localmente y nunca se envían a servidores de terceros" },
-                    { icon: "⬇️", title: "Descargas directas", desc: "Enlaces de descarga optimizados para todos tus archivos en Internet Archive" }
-                ],
-                downloadTitle: "Descarga",
-                recommended: "Recomendado",
-                portableTitle: "Versión Portable",
-                portableDesc: "No requiere instalación. ¡Descarga y ejecuta!",
-                downloadPortable: "Descargar Portable",
-                installerTitle: "Versión Instalador",
-                installerDesc: "Instalador clásico de Windows con accesos directos en el menú Inicio",
-                downloadInstaller: "Descargar Instalador",
-                requirements: "Windows 10/11 (64-bit) • Requiere cuenta de Internet Archive",
-                madeBy: "Hecho por",
-                links: "Reportar error"
-            },
-            de: {
-                title: "IA Item Manager",
-                subtitle: "Verwalte deine Internet Archive Sammlung mit Stil",
-                downloadBtn: "Herunterladen",
-                githubBtn: "Auf GitHub ansehen",
-                featuresTitle: "Funktionen",
-                features: [
-                    { icon: "📤", title: "Dateien hochladen", desc: "Lade Dateien zu Internet Archive mit Echtzeit-Fortschrittsanzeige und Unterstützung für mehrere Dateien hoch" },
-                    { icon: "📁", title: "Items verwalten", desc: "Anzeigen, durchsuchen und organisieren Sie alle Ihre archivierten Items mit einer modernen Oberfläche" },
-                    { icon: "🔍", title: "Leistungsstarke Suche", desc: "Finden Sie schnell Ihre Dateien mit intelligenter Suche, die nur Ihre Items filtert" },
-                    { icon: "📝", title: "Metadaten bearbeiten", desc: "Aktualisieren Sie Metadaten einschließlich Titel, Beschreibung, Betreff, Ersteller und Medientyp" },
-                    { icon: "➕", title: "Zu Sammlungen hinzufügen", desc: "Fügen Sie einfach neue Dateien zu Ihren vorhandenen Items und Sammlungen hinzu" },
-                    { icon: "🌍", title: "Mehrsprachig", desc: "Vollständige Unterstützung für Englisch, Französisch, Spanisch und Deutsch" },
-                    { icon: "🎨", title: "Moderne Oberfläche", desc: "Elegante dunkle Oberfläche mit flüssigen Animationen und intuitiver Navigation" },
-                    { icon: "🔐", title: "Sicher & Privat", desc: "Ihre Anmeldeinformationen werden lokal gespeichert und niemals an Drittserver gesendet" },
-                    { icon: "⬇️", title: "Direkte Downloads", desc: "Optimierte Download-Links für alle Ihre Dateien auf Internet Archive" }
-                ],
-                downloadTitle: "Herunterladen",
-                recommended: "Empfohlen",
-                portableTitle: "Portable Version",
-                portableDesc: "Keine Installation erforderlich. Einfach herunterladen und ausführen!",
-                downloadPortable: "Portable herunterladen",
-                installerTitle: "Installer-Version",
-                installerDesc: "Klassischer Windows-Installer mit Verknüpfungen im Startmenü",
-                downloadInstaller: "Installer herunterladen",
-                requirements: "Windows 10/11 (64-bit) • Benötigt Internet Archive Konto",
-                madeBy: "Erstellt von",
-                links: "Fehler melden"
-            }
-        };
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IA Item Manager — gérez votre collection Internet Archive</title>
+<meta name="description" content="Application de bureau moderne pour gérer vos items Internet Archive et uploader vos fichiers en masse. Windows, gratuit, open-source." />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" type="image/png" href="icon.png" />
+<style>
+  :root {
+    --bg: #0b0d12;
+    --surface: #14171f;
+    --surface-2: #1b1f2a;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --ink: #e7e9ee;
+    --muted: #9aa1af;
+    --faint: #6b7280;
+    --brand: #7c5cff;
+    --accent: #22d3ee;
+  }
 
-        let currentLang = 'fr'; // Français par défaut
-        const languages = ['fr', 'en', 'es', 'de'];
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        function switchLanguage() {
-            const currentIndex = languages.indexOf(currentLang);
-            currentLang = languages[(currentIndex + 1) % languages.length];
-            const t = translations[currentLang];
-            
-            document.getElementById('page-title').textContent = t.title;
-            document.getElementById('subtitle').textContent = t.subtitle;
-            document.getElementById('download-btn').innerHTML = `<span>⬇️</span> ${t.downloadBtn}`;
-            document.getElementById('github-btn').innerHTML = `<span>⭐</span> ${t.githubBtn}`;
-            document.getElementById('features-title').textContent = `✨ ${t.featuresTitle}`;
-            document.getElementById('download-title').textContent = `📦 ${t.downloadTitle}`;
-            document.getElementById('recommended-badge').textContent = `⭐ ${t.recommended}`;
-            document.getElementById('portable-title').textContent = t.portableTitle;
-            document.getElementById('portable-desc').textContent = t.portableDesc;
-            document.getElementById('portable-btn').textContent = t.downloadPortable;
-            document.getElementById('installer-title').textContent = t.installerTitle;
-            document.getElementById('installer-desc').textContent = t.installerDesc;
-            document.getElementById('installer-btn').textContent = t.downloadInstaller;
-            document.getElementById('requirements').textContent = t.requirements;
-            document.getElementById('footer-made').innerHTML = `${t.madeBy} <strong>Snow</strong> • 2025`;
-            document.getElementById('footer-bug').textContent = t.links;
-            
-            const langLabels = {
-                'fr': '🇬🇧 EN',
-                'en': '🇪🇸 ES',
-                'es': '🇩🇪 DE',
-                'de': '🇫🇷 FR'
-            };
-            document.getElementById('lang-btn').textContent = langLabels[currentLang];
-            
-            // Update features
-            const featureCards = document.querySelectorAll('.feature-card');
-            t.features.forEach((feature, index) => {
-                if (featureCards[index]) {
-                    featureCards[index].querySelector('h3').textContent = feature.title;
-                    featureCards[index].querySelector('p').textContent = feature.desc;
-                }
-            });
-        }
-    </script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  html { scroll-behavior: smooth; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #e2e8f0;
-            line-height: 1.6;
-        }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(55rem 40rem at 12% -8%, rgba(124, 92, 255, 0.16), transparent 60%),
+      radial-gradient(50rem 40rem at 108% 4%, rgba(34, 211, 238, 0.10), transparent 55%);
+  }
 
-        /* Header */
-        header {
-            padding: 60px 0 40px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
-        .logo {
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+  a { color: inherit; }
 
-        .logo svg {
-            width: 70px;
-            height: 70px;
-            fill: white;
-        }
+  /* Top bar */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: rgba(11, 13, 18, 0.7);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .wordmark { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .wordmark img { width: 28px; height: 28px; border-radius: 7px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
 
-        h1 {
-            font-size: 3.5em;
-            font-weight: 800;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  .lang-btn {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .lang-btn:hover { color: var(--ink); border-color: var(--line-strong); }
 
-        .subtitle {
-            font-size: 1.4em;
-            color: #94a3b8;
-            margin-bottom: 40px;
-        }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.18s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--brand), var(--accent));
+    color: #0b0d12;
+    box-shadow: 0 8px 30px -8px rgba(124, 92, 255, 0.5);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px -10px rgba(124, 92, 255, 0.6); }
+  .btn-ghost { background: var(--surface-2); border-color: var(--line); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--line-strong); background: #232834; }
+  .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
 
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 40px;
-        }
+  /* Hero */
+  .hero { padding: 84px 0 64px; text-align: center; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(124, 92, 255, 0.14);
+    border: 1px solid rgba(124, 92, 255, 0.3);
+    color: #c4b5fd;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 26px;
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 18px;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--brand), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero p.sub { font-size: clamp(1.05rem, 2.4vw, 1.35rem); color: var(--muted); max-width: 620px; margin: 0 auto 34px; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .hero-note { margin-top: 18px; font-size: 0.85rem; color: var(--faint); }
 
-        .btn {
-            padding: 16px 40px;
-            border-radius: 12px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
+  /* App mockup */
+  .mockup-wrap { margin-top: 64px; perspective: 1600px; }
+  .mockup {
+    max-width: 940px;
+    margin: 0 auto;
+    border-radius: 16px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    box-shadow: 0 40px 120px -30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(124, 92, 255, 0.12);
+    overflow: hidden;
+    transform: rotateX(4deg);
+  }
+  .mockup-bar {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 14px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: #3a4152; }
+  .mockup-body { display: flex; min-height: 380px; text-align: left; }
+  .mk-side { width: 172px; border-right: 1px solid var(--line); padding: 16px 12px; flex-shrink: 0; }
+  .mk-brand { display: flex; align-items: center; gap: 9px; font-size: 0.82rem; font-weight: 600; margin-bottom: 18px; }
+  .mk-brand .sq { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, var(--brand), var(--accent)); }
+  .mk-nav { display: flex; flex-direction: column; gap: 3px; }
+  .mk-nav div { padding: 8px 10px; border-radius: 7px; font-size: 0.8rem; color: var(--muted); }
+  .mk-nav div.on { background: rgba(124, 92, 255, 0.14); color: var(--ink); }
+  .mk-main { flex: 1; padding: 18px; }
+  .mk-toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
+  .mk-input { flex: 1; height: 32px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--line); }
+  .mk-pill { width: 74px; height: 32px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--line); }
+  .mk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mk-card { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+  .mk-card .thumb { aspect-ratio: 4/3; background: linear-gradient(135deg, #232834, #14171f); }
+  .mk-card .meta { padding: 9px 10px; }
+  .mk-card .l1 { height: 8px; width: 78%; border-radius: 4px; background: #333a49; }
+  .mk-card .l2 { height: 7px; width: 50%; border-radius: 4px; background: #262c38; margin-top: 6px; }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-            color: white;
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        }
+  /* Sections */
+  section.block { padding: 80px 0; position: relative; z-index: 1; }
+  .section-head { text-align: center; margin-bottom: 52px; }
+  .section-head h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.02em; }
+  .section-head p { color: var(--muted); margin-top: 10px; }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
-        }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .fcard {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px;
+    transition: all 0.2s ease;
+  }
+  .fcard:hover { border-color: rgba(124, 92, 255, 0.4); transform: translateY(-4px); background: #171b24; }
+  .fcard .ic { font-size: 1.6rem; margin-bottom: 12px; }
+  .fcard h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .fcard p { color: var(--muted); font-size: 0.92rem; }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e2e8f0;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
+  /* What's new band */
+  .newband {
+    background: linear-gradient(135deg, rgba(124, 92, 255, 0.1), rgba(34, 211, 238, 0.06));
+    border-top: 1px solid rgba(124, 92, 255, 0.2);
+    border-bottom: 1px solid rgba(124, 92, 255, 0.2);
+  }
+  .new-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px 28px; max-width: 900px; margin: 0 auto; }
+  .new-list li { list-style: none; display: flex; gap: 10px; align-items: flex-start; color: var(--ink); font-size: 0.95rem; }
+  .new-list li::before { content: '✓'; color: var(--accent); font-weight: 800; flex-shrink: 0; }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
+  /* Download */
+  .dl-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 820px; margin: 0 auto; }
+  .dl-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+  }
+  .dl-card.reco { border-color: rgba(124, 92, 255, 0.5); background: rgba(124, 92, 255, 0.07); }
+  .reco-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--brand), var(--accent));
+    color: #0b0d12;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .dl-card h3 { font-size: 1.25rem; margin-bottom: 6px; }
+  .dl-card .size { color: var(--faint); font-size: 0.85rem; margin-bottom: 14px; }
+  .dl-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+  .requirements { text-align: center; color: var(--faint); font-size: 0.88rem; margin-top: 32px; }
 
-        /* Features */
-        .features {
-            padding: 80px 0;
-        }
+  /* Footer */
+  footer { padding: 44px 0; border-top: 1px solid var(--line); text-align: center; color: var(--muted); position: relative; z-index: 1; }
+  footer .links { margin-top: 10px; font-size: 0.9rem; }
+  footer a { color: var(--brand); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
 
-        .section-title {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 60px;
-            font-weight: 700;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 30px;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(59, 130, 246, 0.5);
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.4em;
-            margin-bottom: 10px;
-            color: #3b82f6;
-        }
-
-        .feature-card p {
-            color: #94a3b8;
-        }
-
-        /* Download Section */
-        .download-section {
-            padding: 80px 0;
-            background: rgba(59, 130, 246, 0.1);
-            border-top: 1px solid rgba(59, 130, 246, 0.2);
-            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .download-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .download-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .download-card.recommended {
-            border-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.1);
-            position: relative;
-        }
-
-        .recommended-badge {
-            position: absolute;
-            top: -12px;
-            right: 20px;
-            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .download-card h3 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-        }
-
-        .download-card .size {
-            color: #94a3b8;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-        }
-
-        /* Footer */
-        footer {
-            padding: 40px 0;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        footer p {
-            color: #94a3b8;
-        }
-
-        footer a {
-            color: #3b82f6;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Language Toggle */
-        .lang-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-
-        .lang-toggle button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            color: #e2e8f0;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .lang-toggle button:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #3b82f6;
-            transform: scale(1.05);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
-            }
-
-            .subtitle {
-                font-size: 1.2em;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-                justify-content: center;
-            }
-        }
-    </style>
+  @media (max-width: 720px) {
+    .mockup-body { min-height: 300px; }
+    .mk-side { display: none; }
+    .mk-grid { grid-template-columns: repeat(2, 1fr); }
+    section.block { padding: 60px 0; }
+  }
+</style>
 </head>
 <body>
-    <div class="lang-toggle">
-        <button id="lang-btn" onclick="switchLanguage()">🇬🇧 EN</button>
+  <div class="topbar">
+    <div class="container">
+      <div class="wordmark">
+        <img src="icon.png" alt="" />
+        <span>IA Item Manager</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="lang-btn" id="langBtn" onclick="cycleLang()">EN</button>
+        <a class="btn btn-ghost btn-sm" href="https://github.com/snowww62/ia-item-manager">GitHub</a>
+      </div>
     </div>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <img src="icon.png" alt="IA Item Manager" style="width: 140px; height: 140px; border-radius: 16px;">
-            </div>
-            <h1 id="page-title">IA Item Manager</h1>
-            <p class="subtitle" id="subtitle">Gérez votre collection Internet Archive avec style</p>
-            <div class="cta-buttons">
-                <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-primary" id="download-btn">
-                    <span>⬇️</span> Télécharger
-                </a>
-                <a href="https://github.com/snowww62/ia-item-manager" class="btn btn-secondary" id="github-btn">
-                    <span>⭐</span> Voir sur GitHub
-                </a>
-            </div>
-        </div>
-    </header>
+  </div>
 
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title" id="features-title">✨ Fonctionnalités</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📤</div>
-                    <h3>Upload de fichiers</h3>
-                    <p>Uploadez vos fichiers sur Internet Archive avec suivi en temps réel et support de fichiers multiples</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📁</div>
-                    <h3>Gestion des items</h3>
-                    <p>Visualisez, parcourez et organisez tous vos items archivés avec une interface moderne</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3>Recherche puissante</h3>
-                    <p>Trouvez rapidement vos fichiers avec une recherche intelligente qui filtre uniquement vos items</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📝</div>
-                    <h3>Édition métadonnées</h3>
-                    <p>Mettez à jour les métadonnées incluant titre, description, sujet, créateur et type de média</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">➕</div>
-                    <h3>Ajout aux collections</h3>
-                    <p>Ajoutez facilement de nouveaux fichiers à vos items et collections existants</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
-                    <h3>Multi-langue</h3>
-                    <p>Support complet pour l'anglais, le français, l'espagnol et l'allemand</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Interface moderne</h3>
-                    <p>Interface élégante en mode sombre avec animations fluides et navigation intuitive</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3>Sécurisé & Privé</h3>
-                    <p>Vos identifiants sont stockés localement et jamais envoyés à des serveurs tiers</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⬇️</div>
-                    <h3>Téléchargements directs</h3>
-                    <p>Liens de téléchargement optimisés pour tous vos fichiers sur Internet Archive</p>
-                </div>
-            </div>
-        </div>
-    </section>
+  <header class="hero">
+    <div class="container">
+      <span class="badge" data-i18n="badge">✨ Version 2.0 — refonte complète</span>
+      <h1><span class="grad">IA Item Manager</span></h1>
+      <p class="sub" data-i18n="sub">Gérez vos items Internet Archive et envoyez vos fichiers en masse, depuis une application de bureau soignée.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/snowww62/ia-item-manager/releases/latest" data-i18n="ctaDownload">⬇️ Télécharger</a>
+        <a class="btn btn-ghost" href="https://github.com/snowww62/ia-item-manager" data-i18n="ctaGithub">⭐ Voir sur GitHub</a>
+      </div>
+      <p class="hero-note" data-i18n="heroNote">Windows 10/11 · 64-bit · gratuit et open-source</p>
 
-    <section class="download-section">
-        <div class="container">
-            <h2 class="section-title" id="download-title">📦 Téléchargement</h2>
-            <div class="download-cards">
-                <div class="download-card recommended">
-                    <span class="recommended-badge" id="recommended-badge">⭐ Recommandé</span>
-                    <h3 id="portable-title">Version Portable</h3>
-                    <p class="size">~70-150 MB</p>
-                    <p id="portable-desc">Aucune installation requise. Téléchargez et lancez !</p>
-                    <br>
-                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest/download/IA-Item-Manager-Portable.exe" class="btn btn-primary" id="portable-btn">
-                        Télécharger Portable
-                    </a>
-                </div>
-                <div class="download-card">
-                    <h3 id="installer-title">Version Installeur</h3>
-                    <p class="size">~70-150 MB</p>
-                    <p id="installer-desc">Installeur Windows classique avec raccourcis menu Démarrer</p>
-                    <br>
-                    <a href="https://github.com/snowww62/ia-item-manager/releases/latest" class="btn btn-secondary" id="installer-btn">
-                        Télécharger Installeur
-                    </a>
-                </div>
+      <div class="mockup-wrap">
+        <div class="mockup">
+          <div class="mockup-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div class="mockup-body">
+            <div class="mk-side">
+              <div class="mk-brand"><span class="sq"></span> IA Item Manager</div>
+              <div class="mk-nav">
+                <div class="on" data-i18n="mkItems">Mes items</div>
+                <div data-i18n="mkUpload">Envoi</div>
+                <div data-i18n="mkCreate">Nouvel item</div>
+                <div data-i18n="mkHelp">Aide</div>
+                <div data-i18n="mkSettings">Réglages</div>
+              </div>
             </div>
-            <div style="text-align: center; margin-top: 40px; color: #94a3b8;">
-                <p id="requirements">Windows 10/11 (64-bit) • Nécessite un compte Internet Archive</p>
+            <div class="mk-main">
+              <div class="mk-toolbar">
+                <div class="mk-input"></div><div class="mk-pill"></div><div class="mk-pill"></div>
+              </div>
+              <div class="mk-grid">
+                <div class="mk-card"><div class="thumb"></div><div class="meta"><div class="l1"></div><div class="l2"></div></div></div>
+                <div class="mk-card"><div class="thumb"></div><div class="meta"><div class="l1"></div><div class="l2"></div></div></div>
+                <div class="mk-card"><div class="thumb"></div><div class="meta"><div class="l1"></div><div class="l2"></div></div></div>
+                <div class="mk-card"><div class="thumb"></div><div class="meta"><div class="l1"></div><div class="l2"></div></div></div>
+                <div class="mk-card"><div class="thumb"></div><div class="meta"><div class="l1"></div><div class="l2"></div></div></div>
+                <div class="mk-card"><div class="thumb"></div><div class="meta"><div class="l1"></div><div class="l2"></div></div></div>
+              </div>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </header>
 
-    <footer>
-        <div class="container">
-            <p id="footer-made">Créé par <strong>Snow</strong> • 2025</p>
-            <p style="margin-top: 10px;">
-                <a href="https://github.com/snowww62/ia-item-manager">GitHub</a> • 
-                <a href="https://github.com/snowww62/ia-item-manager/issues" id="footer-bug">Signaler un bug</a> • 
-                <a href="https://archive.org">Internet Archive</a>
-            </p>
+  <section class="block">
+    <div class="container">
+      <div class="section-head">
+        <h2 data-i18n="featuresTitle">Fonctionnalités</h2>
+        <p data-i18n="featuresSub">Tout ce qu'il faut pour gérer un compte Internet Archive au quotidien.</p>
+      </div>
+      <div class="features-grid" id="featuresGrid"></div>
+    </div>
+  </section>
+
+  <section class="block newband">
+    <div class="container">
+      <div class="section-head">
+        <h2 data-i18n="newTitle">Nouveautés de la version 2.0</h2>
+      </div>
+      <ul class="new-list" id="newList"></ul>
+    </div>
+  </section>
+
+  <section class="block" id="download">
+    <div class="container">
+      <div class="section-head">
+        <h2 data-i18n="downloadTitle">Téléchargement</h2>
+      </div>
+      <div class="dl-cards">
+        <div class="dl-card reco">
+          <span class="reco-badge" data-i18n="recommended">Recommandé</span>
+          <h3 data-i18n="portableTitle">Version portable</h3>
+          <p class="size">~90–160 MB</p>
+          <p data-i18n="portableDesc">Aucune installation. Téléchargez et lancez.</p>
+          <a class="btn btn-primary" href="https://github.com/snowww62/ia-item-manager/releases/latest/download/IA-Item-Manager-Portable.exe" data-i18n="portableBtn">Télécharger le portable</a>
         </div>
-    </footer>
+        <div class="dl-card">
+          <h3 data-i18n="installerTitle">Version installeur</h3>
+          <p class="size">~90–160 MB</p>
+          <p data-i18n="installerDesc">Installeur Windows classique, raccourcis menu Démarrer.</p>
+          <a class="btn btn-ghost" href="https://github.com/snowww62/ia-item-manager/releases/latest" data-i18n="installerBtn">Télécharger l'installeur</a>
+        </div>
+      </div>
+      <p class="requirements" data-i18n="requirements">Windows 10/11 (64-bit) · nécessite un compte Internet Archive et des clés API S3</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p id="footerMade">Créé par <strong>Snow</strong> · 2026</p>
+      <p class="links">
+        <a href="https://github.com/snowww62/ia-item-manager">GitHub</a> ·
+        <a href="https://github.com/snowww62/ia-item-manager/issues" id="footerBug">Signaler un bug</a> ·
+        <a href="https://archive.org">Internet Archive</a>
+      </p>
+    </div>
+  </footer>
+
+<script>
+  const I18N = {
+    fr: {
+      badge: "✨ Version 2.0 — refonte complète",
+      sub: "Gérez vos items Internet Archive et envoyez vos fichiers en masse, depuis une application de bureau soignée.",
+      ctaDownload: "⬇️ Télécharger", ctaGithub: "⭐ Voir sur GitHub",
+      heroNote: "Windows 10/11 · 64-bit · gratuit et open-source",
+      mkItems: "Mes items", mkUpload: "Envoi", mkCreate: "Nouvel item", mkHelp: "Aide", mkSettings: "Réglages",
+      featuresTitle: "Fonctionnalités",
+      featuresSub: "Tout ce qu'il faut pour gérer un compte Internet Archive au quotidien.",
+      newTitle: "Nouveautés de la version 2.0",
+      downloadTitle: "Téléchargement",
+      recommended: "Recommandé",
+      portableTitle: "Version portable", portableDesc: "Aucune installation. Téléchargez et lancez.",
+      portableBtn: "Télécharger le portable",
+      installerTitle: "Version installeur", installerDesc: "Installeur Windows classique, raccourcis menu Démarrer.",
+      installerBtn: "Télécharger l'installeur",
+      requirements: "Windows 10/11 (64-bit) · nécessite un compte Internet Archive et des clés API S3",
+      madeBy: "Créé par", bug: "Signaler un bug",
+      features: [
+        ["📤", "Upload en masse", "Glisser-déposer, progression et vitesse par fichier, réessai des échecs, dossiers de destination automatiques."],
+        ["🗂️", "Navigateur d'items", "Vignettes, tri (date, titre, vues), filtre par type de média, vue grille ou liste, pagination."],
+        ["☑️", "Sélection multiple", "Cochez plusieurs items ou fichiers pour les ouvrir ou les supprimer d'un coup."],
+        ["🔎", "Recherche instantanée", "Filtre uniquement vos items grâce à votre e-mail Internet Archive."],
+        ["🧾", "Détails par onglets", "Aperçu, Fichiers, Métadonnées et vue Brute pour chaque item."],
+        ["⚙️", "Statut de traitement", "Suivi des tâches archive.org en cours et relance de la dérivation en un clic."],
+        ["📦", "Téléchargement ZIP", "Récupérez l'intégralité d'un item en une seule archive."],
+        ["✏️", "Métadonnées complètes", "Titre, description, sujet, créateur, date, licence, langue et type de média."],
+        ["🔌", "Test de connexion", "Vérifie vos clés API et affiche votre pseudo Internet Archive."],
+        ["✨", "Nouvel item", "Créez un item depuis l'app — mode avancé, avec avertissement anti-spam."],
+        ["🔔", "Notifications intégrées", "Toasts et boîtes de dialogue soignés, fini les pop-ups du navigateur."],
+        ["🔐", "Clés chiffrées", "Vos identifiants sont chiffrés au repos via le trousseau du système."]
+      ],
+      new: [
+        "Interface entièrement repensée (sombre, violet / cyan)",
+        "Glisser-déposer pour l'upload, avec vitesse et réessai",
+        "Vignettes, tri, filtres et bascule grille / liste",
+        "Statut de traitement archive.org et relance de dérivation",
+        "Téléchargement d'un item complet en ZIP",
+        "Barre latérale rétractable et raccourcis clavier",
+        "Espagnol et allemand rétablis — 4 langues complètes"
+      ]
+    },
+    en: {
+      badge: "✨ Version 2.0 — full redesign",
+      sub: "Manage your Internet Archive items and bulk-upload files from a polished desktop app.",
+      ctaDownload: "⬇️ Download", ctaGithub: "⭐ View on GitHub",
+      heroNote: "Windows 10/11 · 64-bit · free and open-source",
+      mkItems: "My items", mkUpload: "Upload", mkCreate: "New item", mkHelp: "Help", mkSettings: "Settings",
+      featuresTitle: "Features",
+      featuresSub: "Everything you need to run an Internet Archive account day to day.",
+      newTitle: "What's new in 2.0",
+      downloadTitle: "Download",
+      recommended: "Recommended",
+      portableTitle: "Portable version", portableDesc: "No install. Download and run.",
+      portableBtn: "Download portable",
+      installerTitle: "Installer version", installerDesc: "Classic Windows installer with Start Menu shortcuts.",
+      installerBtn: "Download installer",
+      requirements: "Windows 10/11 (64-bit) · requires an Internet Archive account and S3 API keys",
+      madeBy: "Made by", bug: "Report a bug",
+      features: [
+        ["📤", "Bulk upload", "Drag & drop, per-file progress and speed, retry failed, automatic destination folders."],
+        ["🗂️", "Item browser", "Thumbnails, sort (date, title, views), media-type filter, grid or list view, pagination."],
+        ["☑️", "Multi-select", "Tick several items or files to open or delete them at once."],
+        ["🔎", "Instant search", "Filters to your own items using your Internet Archive email."],
+        ["🧾", "Tabbed details", "Overview, Files, Metadata and Raw view for every item."],
+        ["⚙️", "Processing status", "Track running archive.org tasks and re-run derivation in one click."],
+        ["📦", "ZIP download", "Grab an entire item as a single archive."],
+        ["✏️", "Full metadata editor", "Title, description, subject, creator, date, license, language and media type."],
+        ["🔌", "Connection test", "Checks your API keys and shows your Internet Archive screen name."],
+        ["✨", "New item", "Create an item from the app — advanced mode, with a spam-risk warning."],
+        ["🔔", "Built-in notifications", "Polished toasts and dialogs — no more browser pop-ups."],
+        ["🔐", "Encrypted keys", "Your credentials are encrypted at rest via the OS keychain."]
+      ],
+      new: [
+        "Completely redesigned interface (dark, violet / cyan)",
+        "Drag & drop uploads with speed and retry",
+        "Thumbnails, sorting, filters and grid / list toggle",
+        "archive.org processing status and re-derivation",
+        "Download a whole item as a ZIP",
+        "Collapsible sidebar and keyboard shortcuts",
+        "Spanish and German restored — 4 full languages"
+      ]
+    },
+    es: {
+      badge: "✨ Versión 2.0 — rediseño completo",
+      sub: "Gestiona tus ítems de Internet Archive y sube archivos en lote desde una app de escritorio cuidada.",
+      ctaDownload: "⬇️ Descargar", ctaGithub: "⭐ Ver en GitHub",
+      heroNote: "Windows 10/11 · 64-bit · gratis y de código abierto",
+      mkItems: "Mis ítems", mkUpload: "Subir", mkCreate: "Ítem nuevo", mkHelp: "Ayuda", mkSettings: "Ajustes",
+      featuresTitle: "Características",
+      featuresSub: "Todo lo necesario para llevar una cuenta de Internet Archive a diario.",
+      newTitle: "Novedades de la 2.0",
+      downloadTitle: "Descarga",
+      recommended: "Recomendado",
+      portableTitle: "Versión portable", portableDesc: "Sin instalación. Descarga y ejecuta.",
+      portableBtn: "Descargar portable",
+      installerTitle: "Versión instalador", installerDesc: "Instalador clásico de Windows con accesos directos.",
+      installerBtn: "Descargar instalador",
+      requirements: "Windows 10/11 (64-bit) · requiere cuenta de Internet Archive y claves API S3",
+      madeBy: "Hecho por", bug: "Reportar un fallo",
+      features: [
+        ["📤", "Subida en lote", "Arrastrar y soltar, progreso y velocidad por archivo, reintento de fallidos, carpetas automáticas."],
+        ["🗂️", "Explorador de ítems", "Miniaturas, orden (fecha, título, vistas), filtro por tipo, vista cuadrícula o lista, paginación."],
+        ["☑️", "Selección múltiple", "Marca varios ítems o archivos para abrirlos o eliminarlos de una vez."],
+        ["🔎", "Búsqueda instantánea", "Filtra solo tus ítems usando tu correo de Internet Archive."],
+        ["🧾", "Detalles por pestañas", "Resumen, Archivos, Metadatos y vista Bruta para cada ítem."],
+        ["⚙️", "Estado de procesamiento", "Sigue las tareas de archive.org y vuelve a derivar con un clic."],
+        ["📦", "Descarga ZIP", "Obtén un ítem entero en un solo archivo."],
+        ["✏️", "Editor de metadatos completo", "Título, descripción, tema, autor, fecha, licencia, idioma y tipo de medio."],
+        ["🔌", "Prueba de conexión", "Comprueba tus claves API y muestra tu nombre de usuario de Internet Archive."],
+        ["✨", "Ítem nuevo", "Crea un ítem desde la app — modo avanzado, con aviso de riesgo de spam."],
+        ["🔔", "Notificaciones integradas", "Avisos y diálogos cuidados — se acabaron los pop-ups del navegador."],
+        ["🔐", "Claves cifradas", "Tus credenciales se cifran en reposo con el llavero del sistema."]
+      ],
+      new: [
+        "Interfaz completamente rediseñada (oscura, violeta / cian)",
+        "Subidas por arrastrar y soltar, con velocidad y reintento",
+        "Miniaturas, orden, filtros y cambio cuadrícula / lista",
+        "Estado de procesamiento de archive.org y re-derivación",
+        "Descarga de un ítem completo en ZIP",
+        "Barra lateral plegable y atajos de teclado",
+        "Español y alemán restaurados — 4 idiomas completos"
+      ]
+    },
+    de: {
+      badge: "✨ Version 2.0 — komplett neu",
+      sub: "Verwalte deine Internet-Archive-Objekte und lade Dateien in großer Zahl hoch — in einer aufgeräumten Desktop-App.",
+      ctaDownload: "⬇️ Herunterladen", ctaGithub: "⭐ Auf GitHub ansehen",
+      heroNote: "Windows 10/11 · 64-bit · kostenlos und quelloffen",
+      mkItems: "Meine Objekte", mkUpload: "Hochladen", mkCreate: "Neues Objekt", mkHelp: "Hilfe", mkSettings: "Einstellungen",
+      featuresTitle: "Funktionen",
+      featuresSub: "Alles, um ein Internet-Archive-Konto im Alltag zu führen.",
+      newTitle: "Neu in 2.0",
+      downloadTitle: "Download",
+      recommended: "Empfohlen",
+      portableTitle: "Portable Version", portableDesc: "Keine Installation. Herunterladen und starten.",
+      portableBtn: "Portable herunterladen",
+      installerTitle: "Installer-Version", installerDesc: "Klassischer Windows-Installer mit Startmenü-Verknüpfungen.",
+      installerBtn: "Installer herunterladen",
+      requirements: "Windows 10/11 (64-bit) · benötigt Internet-Archive-Konto und S3-API-Schlüssel",
+      madeBy: "Erstellt von", bug: "Fehler melden",
+      features: [
+        ["📤", "Massen-Upload", "Drag & Drop, Fortschritt und Tempo je Datei, Wiederholung fehlgeschlagener, automatische Zielordner."],
+        ["🗂️", "Objekt-Browser", "Vorschaubilder, Sortierung (Datum, Titel, Aufrufe), Medientyp-Filter, Raster- oder Listenansicht, Seiten."],
+        ["☑️", "Mehrfachauswahl", "Mehrere Objekte oder Dateien markieren und auf einmal öffnen oder löschen."],
+        ["🔎", "Sofortsuche", "Filtert nur deine Objekte über deine Internet-Archive-E-Mail."],
+        ["🧾", "Details in Tabs", "Übersicht, Dateien, Metadaten und Rohansicht für jedes Objekt."],
+        ["⚙️", "Verarbeitungsstatus", "Laufende archive.org-Aufgaben verfolgen und Ableitung per Klick neu starten."],
+        ["📦", "ZIP-Download", "Ein ganzes Objekt als einzelnes Archiv laden."],
+        ["✏️", "Voller Metadaten-Editor", "Titel, Beschreibung, Thema, Ersteller, Datum, Lizenz, Sprache und Medientyp."],
+        ["🔌", "Verbindungstest", "Prüft deine API-Schlüssel und zeigt deinen Internet-Archive-Namen."],
+        ["✨", "Neues Objekt", "Ein Objekt aus der App anlegen — Fortgeschrittenen-Modus mit Spam-Warnung."],
+        ["🔔", "Integrierte Hinweise", "Aufgeräumte Toasts und Dialoge — keine Browser-Pop-ups mehr."],
+        ["🔐", "Verschlüsselte Schlüssel", "Deine Zugangsdaten werden über den System-Schlüsselbund verschlüsselt gespeichert."]
+      ],
+      new: [
+        "Komplett überarbeitete Oberfläche (dunkel, Violett / Cyan)",
+        "Drag-&-Drop-Uploads mit Tempo und Wiederholung",
+        "Vorschaubilder, Sortierung, Filter und Raster / Liste",
+        "archive.org-Verarbeitungsstatus und Neu-Ableitung",
+        "Ein ganzes Objekt als ZIP herunterladen",
+        "Einklappbare Seitenleiste und Tastaturkürzel",
+        "Spanisch und Deutsch zurück — 4 vollständige Sprachen"
+      ]
+    }
+  };
+
+  const ORDER = ['fr', 'en', 'es', 'de'];
+  const LABELS = { fr: 'EN', en: 'ES', es: 'DE', de: 'FR' };
+  let lang = 'fr';
+
+  function render() {
+    const t = I18N[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] != null) el.textContent = t[key];
+    });
+    document.getElementById('langBtn').textContent = LABELS[lang];
+    document.getElementById('footerMade').innerHTML = `${t.madeBy} <strong>Snow</strong> · 2026`;
+    document.getElementById('footerBug').textContent = t.bug;
+
+    document.getElementById('featuresGrid').innerHTML = t.features
+      .map(([ic, h, p]) => `<div class="fcard"><div class="ic">${ic}</div><h3>${h}</h3><p>${p}</p></div>`)
+      .join('');
+    document.getElementById('newList').innerHTML = t.new.map((x) => `<li>${x}</li>`).join('');
+  }
+
+  function cycleLang() {
+    lang = ORDER[(ORDER.indexOf(lang) + 1) % ORDER.length];
+    render();
+  }
+
+  render();
+</script>
 </body>
 </html>
