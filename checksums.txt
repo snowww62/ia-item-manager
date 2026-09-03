@@ -1,12 +1,18 @@
-SHA256 Checksums - IA Item Manager v1.0.1
+SHA256 Checksums - IA Item Manager v2.0.0
 
 IA-Item-Manager-Portable.exe:
-0d2bfce7e3c3cfca2bfcec57cb5575272c7efc5a4cc0563517acae4bc5d3099c
+3824af9a5a22050236f77f070164a8cb00a070be6b7ef2b129409cf4d75426f6
 
-IA Item Manager Setup 1.0.1.exe:
-0f73869f653e1365d14e0601d6474c0946abf7d69895427f6ec612c2c4efaf9a
+IA Item Manager Setup 2.0.0.exe:
+5066f0bc9052450a2835b5433f6fa60add293721f424790df090f2d0cff9c6fe
 
+
+Regenerate after building (Windows):
 
 certutil -hashfile "build_output/IA-Item-Manager-Portable.exe" SHA256
 
-certutil -hashfile "build_output/IA Item Manager Setup 1.0.1.exe" SHA256
+certutil -hashfile "build_output/IA Item Manager Setup 2.0.0.exe" SHA256
+
+Note: hashes above correspond to a local electron-builder run. If you rebuild
+on another machine, recompute them and update this file before publishing the
+GitHub release.
