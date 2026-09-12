@@ -39,6 +39,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [pause, setPause] = useState(null); // { seconds, streak } | null
   const speedRef = useRef({});
 
   useEffect(() => {
@@ -108,6 +109,14 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
 
   const folderValid = FOLDER_RE.test(targetFolder.trim());
 
+  const sleepWithCountdown = async (totalSeconds, streakNum) => {
+    for (let s = totalSeconds; s > 0; s--) {
+      setPause({ seconds: s, streak: streakNum });
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    setPause(null);
+  };
+
   const runUpload = async (targets) => {
     if (!identifier || targets.length === 0 || !credentials.accessKey || !credentials.secretKey) {
       toast.error(t('upload.fillRequired'));
@@ -118,6 +127,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
     let ok = 0;
     let fail = 0;
     let warnedRateLimit = false;
+    let streak = 0; // consecutive SlowDown responses across this batch
 
     for (let i = 0; i < targets.length; i++) {
       const file = targets[i];
@@ -136,6 +146,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
         });
         if (res.success) {
           ok++;
+          streak = 0;
           setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'done', progress: 100, speed: '' } : f)));
         } else {
           fail++;
@@ -154,7 +165,16 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
       }
 
       if (i < targets.length - 1) {
-        await new Promise((r) => setTimeout(r, rateLimited ? 20000 : 2000));
+        if (rateLimited) {
+          // archive.org's global task queue is congested: back off harder each time
+          // this happens in a row (30s, 60s, 120s, ... capped at 5 min) instead of
+          // hammering it every 2s, which just adds to the congestion.
+          streak += 1;
+          const seconds = Math.min(30 * 2 ** (streak - 1), 300);
+          await sleepWithCountdown(seconds, streak);
+        } else {
+          await new Promise((r) => setTimeout(r, 2000));
+        }
       }
     }
 
@@ -216,6 +236,16 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
               />
             </div>
           </div>
+
+          {/* Congestion pause banner */}
+          {pause && (
+            <div className="flex items-center gap-3 px-4 py-3 bg-warn/10 border border-warn/25 rounded-sm animate-slide-up">
+              <Loader className="w-4 h-4 text-warn animate-spin shrink-0" />
+              <p className="text-sm text-warn">
+                {t('upload.pausing', { seconds: pause.seconds })}
+              </p>
+            </div>
+          )}
 
           {/* Dropzone */}
           <div

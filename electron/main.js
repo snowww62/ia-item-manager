@@ -46,8 +46,16 @@ async function retryOperation(operation, maxRetries = 3, baseDelay = 1000) {
       return await operation();
     } catch (error) {
       const isLastAttempt = attempt === maxRetries - 1;
-      const isRetryable = error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT' ||
-                          error.response?.status === 503 || error.response?.status === 429;
+      // A "SlowDown" (task queue saturated) won't clear in the few seconds an
+      // internal retry loop can afford - hammering it again only adds load to
+      // an already-congested queue. Fail fast here and let the caller apply a
+      // much longer, batch-level cooldown instead.
+      const isTaskQueueSlowDown = typeof error.response?.data === 'string' &&
+        error.response.data.includes('<Code>SlowDown</Code>');
+      const isRetryable = !isTaskQueueSlowDown && (
+        error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT' ||
+        error.response?.status === 503 || error.response?.status === 429
+      );
 
       if (isLastAttempt || !isRetryable) {
         throw error;
@@ -432,7 +440,7 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
           }
         }
       });
-    }, 5, 4000); // a full task-queue drains slowly; give it up to ~2 minutes across retries
+    });
 
     return { success: true, data: response.data };
   } catch (error) {
@@ -474,7 +482,7 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
           }
         }
       });
-    }, 5, 4000);
+    });
 
     return { success: true, data: response.data };
   } catch (error) {
