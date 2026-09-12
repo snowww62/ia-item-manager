@@ -59,6 +59,21 @@ async function retryOperation(operation, maxRetries = 3, baseDelay = 1000) {
   }
 }
 
+// archive.org's S3-like API answers throttling/errors with an XML body
+// (e.g. <Error><Code>SlowDown</Code><Message>...</Message></Error>).
+// Turn that into a clean { code, message } pair instead of dumping raw XML in the UI.
+function parseS3Error(data, fallbackMessage) {
+  if (typeof data === 'string' && data.includes('<Error>')) {
+    const code = /<Code>([^<]+)<\/Code>/.exec(data)?.[1] || null;
+    const message = /<Message>([^<]+)<\/Message>/.exec(data)?.[1];
+    if (code) return { code, message: message || fallbackMessage };
+  }
+  if (typeof data === 'string' && data.trim()) {
+    return { code: null, message: data };
+  }
+  return { code: null, message: fallbackMessage };
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
@@ -417,12 +432,12 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
           }
         }
       });
-    });
+    }, 5, 4000); // a full task-queue drains slowly; give it up to ~2 minutes across retries
 
     return { success: true, data: response.data };
   } catch (error) {
-    const errorMsg = error.response?.data || error.message;
-    return { success: false, error: errorMsg };
+    const { code, message } = parseS3Error(error.response?.data, error.message);
+    return { success: false, error: message, errorCode: code };
   }
 });
 
@@ -459,12 +474,12 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
           }
         }
       });
-    });
+    }, 5, 4000);
 
     return { success: true, data: response.data };
   } catch (error) {
-    const errorMsg = error.response?.data || error.message;
-    return { success: false, error: errorMsg };
+    const { code, message } = parseS3Error(error.response?.data, error.message);
+    return { success: false, error: message, errorCode: code };
   }
 });
 
@@ -491,7 +506,8 @@ ipcMain.handle('ia:deleteFile', async (event, { identifier, fileName, accessKey,
 
     return { success: true, data: response.data };
   } catch (error) {
-    return { success: false, error: error.response?.data || error.message };
+    const { code, message } = parseS3Error(error.response?.data, error.message);
+    return { success: false, error: message, errorCode: code };
   }
 });
 

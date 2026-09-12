@@ -33,7 +33,9 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
 
   const [identifier, setIdentifier] = useState(prefilledIdentifier || '');
   const [targetFolder, setTargetFolder] = useState('');
-  const [queueDerive, setQueueDerive] = useState(true);
+  // Off by default: queuing a derive task per file is the main way bulk uploads
+  // trip archive.org's "total_tasks_queued exceeds global_limit" throttle.
+  const [queueDerive, setQueueDerive] = useState(false);
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -115,10 +117,12 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
     const totalSize = files.reduce((s, f) => s + (f.size || 0), 0);
     let ok = 0;
     let fail = 0;
+    let warnedRateLimit = false;
 
     for (let i = 0; i < targets.length; i++) {
       const file = targets[i];
-      setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'uploading', progress: 0, error: '' } : f)));
+      setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'uploading', progress: 0, error: '', errorCode: null } : f)));
+      let rateLimited = false;
       try {
         const res = await window.electronAPI.uploadFile({
           identifier,
@@ -135,14 +139,23 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
           setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'done', progress: 100, speed: '' } : f)));
         } else {
           fail++;
+          rateLimited = res.errorCode === 'SlowDown';
           const msg = typeof res.error === 'string' ? res.error : JSON.stringify(res.error);
-          setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'failed', error: msg, speed: '' } : f)));
+          setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'failed', error: msg, errorCode: res.errorCode, speed: '' } : f)));
         }
       } catch (err) {
         fail++;
         setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'failed', error: err.message, speed: '' } : f)));
       }
-      if (i < targets.length - 1) await new Promise((r) => setTimeout(r, 2000));
+
+      if (rateLimited && !warnedRateLimit) {
+        warnedRateLimit = true;
+        toast.warning(t('upload.rateLimitedToast'));
+      }
+
+      if (i < targets.length - 1) {
+        await new Promise((r) => setTimeout(r, rateLimited ? 20000 : 2000));
+      }
     }
 
     setUploading(false);
@@ -275,7 +288,12 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
                         </div>
                       )}
                       {f.status === 'failed' && f.error && (
-                        <p className="text-xs text-bad mt-1.5 break-words">{f.error}</p>
+                        <>
+                          <p className="text-xs text-bad mt-1.5 break-words">{f.error}</p>
+                          {f.errorCode === 'SlowDown' && (
+                            <p className="text-xs text-warn mt-1">{t('upload.rateLimitedHint')}</p>
+                          )}
+                        </>
                       )}
                     </div>
                   );
