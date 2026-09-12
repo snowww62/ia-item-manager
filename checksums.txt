@@ -3,7 +3,7 @@ SHA256 Checksums - IA Item Manager v2.0.0
 IA-Item-Manager-Portable.exe:
 3e03ed4d8a1c11025f46c137fdc1f75d9a01f1d5684b53ff80c854eb84878e2c
 
-IA Item Manager Setup 2.0.0.exe:
+IA-Item-Manager-Setup.exe:
 5f0fde89ea5507155b57ff3d391c7b87c15073b4a4ab0f9d9f48a580ffdc2640
 
 
@@ -11,8 +11,15 @@ Regenerate after building (Windows):
 
 certutil -hashfile "build_output/IA-Item-Manager-Portable.exe" SHA256
 
-certutil -hashfile "build_output/IA Item Manager Setup 2.0.0.exe" SHA256
+certutil -hashfile "build_output/IA-Item-Manager-Setup.exe" SHA256
 
 Note: hashes above correspond to a local electron-builder run. If you rebuild
 on another machine, recompute them and update this file before publishing the
 GitHub release.
+
+The installer artifact name is now fixed (IA-Item-Manager-Setup.exe, no
+spaces, no version number) via nsis.artifactName in package.json, matching
+the portable build. This keeps the GitHub Pages site's direct download link
+valid across releases - GitHub silently turns spaces in uploaded asset names
+into dots (e.g. the v2.0.0 release's installer briefly ended up as
+"IA.Item.Manager.Setup.2.0.0.exe"), which broke direct linking before.

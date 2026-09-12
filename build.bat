@@ -37,7 +37,7 @@ echo ================================================
 echo.
 echo Your executable files are in the "build_output" folder:
 echo   - IA-Item-Manager-Portable.exe (double-click to run, no install needed)
-echo   - IA Item Manager Setup 2.0.0.exe (installer version)
+echo   - IA-Item-Manager-Setup.exe (installer version)
 echo.
 echo You can share IA-Item-Manager-Portable.exe with others!
 echo.

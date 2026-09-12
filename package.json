@@ -61,7 +61,8 @@
       "allowElevation": false,
       "installerIcon": "public/icon.ico",
       "uninstallerIcon": "public/icon.ico",
-      "deleteAppDataOnUninstall": true
+      "deleteAppDataOnUninstall": true,
+      "artifactName": "IA-Item-Manager-Setup.exe"
     },
     "publish": null,
     "portable": {
