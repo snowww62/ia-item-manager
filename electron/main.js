@@ -22,6 +22,16 @@ crashReporter.start({ uploadToServer: false, compress: true });
 // called before app.whenReady().
 app.disableHardwareAcceleration();
 
+// Exposes global.gc() here in the main process AND window.gc() in the
+// renderer (it's a Chromium/V8 flag, applies to every JS context this app
+// spawns). Buffers from a finished upload are eligible for collection the
+// moment the request settles, but V8's own scheduler decides *when* to
+// actually reclaim them, and under memory pressure that can lag behind
+// allocation. Forcing a GC pass right after each file (see ia:upload below,
+// and the renderer side in UploadPanel) reclaims it immediately instead of
+// hoping V8 gets to it before the next large file starts.
+app.commandLine.appendSwitch('js-flags', '--expose-gc');
+
 let mainWindow;
 
 const APP_VERSION = '2.0.1';
@@ -147,6 +157,16 @@ function logActivity(line) {
 }
 
 logActivity(`app starting (v${APP_VERSION})`);
+
+// Requires the --expose-gc js-flag set above. Safe no-op if the flag somehow
+// didn't take (global.gc undefined) - never let a memory-hygiene step throw.
+function forceGc() {
+  try {
+    if (global.gc) global.gc();
+  } catch {
+    /* best effort */
+  }
+}
 
 function sendToRenderer(channel, payload) {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -628,10 +648,12 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
     });
 
     logActivity(`upload done: ${fileName}`);
+    forceGc();
     return { success: true, data: response.data };
   } catch (error) {
     const { code, message } = parseS3Error(error.response?.data, error.message);
     logActivity(`upload FAILED: ${fileName}: ${code || ''} ${message}`);
+    forceGc();
     return { success: false, error: message, errorCode: code };
   }
 });
@@ -673,9 +695,11 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
       });
     });
 
+    forceGc();
     return { success: true, data: response.data };
   } catch (error) {
     const { code, message } = parseS3Error(error.response?.data, error.message);
+    forceGc();
     return { success: false, error: message, errorCode: code };
   }
 });

@@ -205,6 +205,12 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
         setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'failed', error: err.message, speed: '' } : f)));
       }
 
+      // --expose-gc (set in main.js) exposes this here too. Reclaim whatever
+      // this file's progress-event closures/IPC payloads left behind right
+      // away instead of leaving it for V8's own scheduling, which under
+      // memory pressure can lag behind a queue of large files.
+      if (window.gc) window.gc();
+
       if (rateLimited && !warnedRateLimit) {
         warnedRateLimit = true;
         toast.warning(t('upload.rateLimitedToast'));
