@@ -234,7 +234,7 @@ app.on('activate', () => {
 
 ipcMain.handle('app:getVersion', () => APP_VERSION);
 
-const GITHUB_REPO = 'snowww62/ia-item-manager';
+const GITHUB_REPO = 'snowww62/retrovault-archive-manager';
 
 function compareVersions(a, b) {
   const pa = String(a).replace(/^v/i, '').split('.').map((n) => parseInt(n, 10) || 0);

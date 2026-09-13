@@ -9,7 +9,7 @@ import PageHeader from './ui/PageHeader';
 import Spinner from './ui/Spinner';
 import Badge from './ui/Badge';
 
-const REPO_URL = 'https://github.com/snowww62/ia-item-manager';
+const REPO_URL = 'https://github.com/snowww62/retrovault-archive-manager';
 
 const LinkRow = ({ icon: Icon, label, onClick }) => (
   <button
