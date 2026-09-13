@@ -41,6 +41,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
   const [dragOver, setDragOver] = useState(false);
   const [pause, setPause] = useState(null); // { seconds, streak } | null
   const speedRef = useRef({});
+  const lastRenderRef = useRef({});
 
   useEffect(() => {
     if (prefilledIdentifier) setIdentifier(prefilledIdentifier);
@@ -58,6 +59,15 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
         if (dt > 0 && db > 0) speed = `${fmtSize(db / dt)}/s`;
       }
       speedRef.current[data.fileName] = { t: now, loaded: data.loaded ?? 0 };
+
+      // A large file can fire many progress events per second; re-rendering
+      // the whole queue every time adds real CPU/GPU load for no visible
+      // benefit. Cap re-renders to ~5/s per file, but never drop the 100%
+      // event so the bar always reaches full.
+      const lastRender = lastRenderRef.current[data.fileName] || 0;
+      if (data.progress < 100 && now - lastRender < 200) return;
+      lastRenderRef.current[data.fileName] = now;
+
       setFiles((list) =>
         list.map((f) =>
           f.name === data.fileName ? { ...f, progress: data.progress, status: 'uploading', speed } : f

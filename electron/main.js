@@ -10,6 +10,11 @@ let mainWindow;
 const APP_VERSION = '2.0.0';
 const USER_AGENT = `IA-Item-Manager/${APP_VERSION} (Desktop Application)`;
 
+// Kept short for quick calls (search, metadata, etc). File PUTs override this
+// per-request with timeout: 0 - a 60s ceiling would abort any upload of a
+// large file on a normal connection mid-stream, and cancelling a request
+// whose body is an open file stream is exactly the kind of thing that can
+// surface as an unhandled error and take the whole process down with it.
 const axiosInstance = axios.create({
   timeout: 60000,
   maxBodyLength: Infinity,
@@ -82,6 +87,46 @@ function parseS3Error(data, fallbackMessage) {
   return { code: null, message: fallbackMessage };
 }
 
+// --- Crash safety net -------------------------------------------------
+// If anything throws outside a try/catch (e.g. an unhandled 'error' event
+// on a request/file stream when a slow upload is aborted), Node's default
+// behaviour is to kill the whole process with no trace. Log it instead so a
+// silent "the app just closed" can actually be diagnosed from
+// %APPDATA%/IA Item Manager/crash.log.
+const crashLogPath = path.join(app.getPath('userData'), 'crash.log');
+
+function logCrash(label, err) {
+  try {
+    const line = `[${new Date().toISOString()}] ${label}: ${err?.stack || err}\n`;
+    fs.appendFileSync(crashLogPath, line);
+  } catch {
+    /* best effort - if we can't even write the log, there's nothing more to do */
+  }
+}
+
+process.on('uncaughtException', (err) => logCrash('uncaughtException', err));
+process.on('unhandledRejection', (reason) => logCrash('unhandledRejection', reason));
+
+function sendToRenderer(channel, payload) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    try {
+      mainWindow.webContents.send(channel, payload);
+    } catch (err) {
+      logCrash(`sendToRenderer(${channel})`, err);
+    }
+  }
+}
+
+// A plain fs.createReadStream() left to itself will emit an unhandled
+// 'error' (and crash the process) if the underlying HTTP request aborts
+// mid-transfer (e.g. a timeout) or the file becomes unreadable mid-upload.
+// Give it a listener so that ends up as a normal rejected promise instead.
+function openUploadStream(filePath) {
+  const stream = fs.createReadStream(filePath);
+  stream.on('error', (err) => logCrash('upload stream', err));
+  return stream;
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
@@ -117,6 +162,13 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
+// The renderer (Chromium tab) can die on its own - e.g. OOM-killed - which is
+// a different failure mode from a main-process exception and would otherwise
+// just look like "the app closed itself" with zero explanation.
+app.on('render-process-gone', (event, webContents, details) => {
+  logCrash('render-process-gone', JSON.stringify(details));
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
@@ -142,6 +194,21 @@ ipcMain.handle('shell:openExternal', async (event, url) => {
   }
   return { success: false, error: 'Invalid URL' };
 });
+
+ipcMain.handle('app:openCrashLogFolder', async () => {
+  try {
+    if (fs.existsSync(crashLogPath)) {
+      shell.showItemInFolder(crashLogPath);
+    } else {
+      await shell.openPath(path.dirname(crashLogPath));
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('app:hasCrashLog', () => fs.existsSync(crashLogPath));
 
 /* ------------------------------------------------------------------ */
 /*  Credentials (encrypted at rest via OS keychain)                    */
@@ -426,15 +493,18 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
     const response = await retryOperation(async () => {
       // A fresh stream per attempt: a Node Readable can only be consumed once,
       // and retryOperation may call this more than once on transient errors.
+      // timeout: 0 (no limit) - the instance default (60s) would abort large
+      // files mid-transfer on a normal connection.
       return await axiosInstance({
         method: 'put',
         url: `https://s3.us.archive.org/${identifier}/${encodedPath}`,
-        data: fs.createReadStream(filePath),
+        data: openUploadStream(filePath),
         headers: headers,
+        timeout: 0,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            mainWindow.webContents.send('upload-progress', {
+            sendToRenderer('upload-progress', {
               fileName,
               progress: percentCompleted,
               loaded: progressEvent.loaded,
@@ -477,12 +547,13 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
       return await axiosInstance({
         method: 'put',
         url: `https://s3.us.archive.org/${identifier}/${encodeURIComponent(fileName)}`,
-        data: fs.createReadStream(filePath),
+        data: openUploadStream(filePath),
         headers,
+        timeout: 0,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            mainWindow.webContents.send('upload-progress', { fileName, progress: percentCompleted });
+            sendToRenderer('upload-progress', { fileName, progress: percentCompleted });
           }
         }
       });

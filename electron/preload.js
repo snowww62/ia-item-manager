@@ -4,6 +4,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // App / system
   getVersion: () => ipcRenderer.invoke('app:getVersion'),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
+  openCrashLogFolder: () => ipcRenderer.invoke('app:openCrashLogFolder'),
+  hasCrashLog: () => ipcRenderer.invoke('app:hasCrashLog'),
 
   // Internet Archive
   uploadFile: (data) => ipcRenderer.invoke('ia:upload', data),

@@ -236,6 +236,8 @@ const en = {
     descriptionText: "A desktop manager for your Internet Archive items and files.",
     privacy: "Privacy",
     privacyText: "Credentials stay on this computer. The app talks only to official Internet Archive APIs over HTTPS.",
+    crashLog: "Open crash log folder",
+    crashLogHelp: "If the app closes unexpectedly, this folder may contain a crash.log file - send it to us to help diagnose the issue.",
   },
 
   faq: {
@@ -499,6 +501,8 @@ const fr = {
     descriptionText: "Un gestionnaire de bureau pour vos items et fichiers Internet Archive.",
     privacy: "Confidentialité",
     privacyText: "Les identifiants restent sur cet ordinateur. L'app ne communique qu'avec les API officielles d'Internet Archive en HTTPS.",
+    crashLog: "Ouvrir le dossier des journaux de plantage",
+    crashLogHelp: "Si l'app se ferme de façon inattendue, ce dossier peut contenir un fichier crash.log — envoie-le-nous pour nous aider à diagnostiquer le problème.",
   },
 
   faq: {
@@ -762,6 +766,8 @@ const es = {
     descriptionText: "Un gestor de escritorio para tus ítems y archivos de Internet Archive.",
     privacy: "Privacidad",
     privacyText: "Las credenciales se quedan en este equipo. La app solo se comunica con las API oficiales de Internet Archive por HTTPS.",
+    crashLog: "Abrir carpeta de registros de errores",
+    crashLogHelp: "Si la app se cierra de forma inesperada, esta carpeta puede contener un archivo crash.log — envíanoslo para ayudarnos a diagnosticar el problema.",
   },
 
   faq: {
@@ -1025,6 +1031,8 @@ const de = {
     descriptionText: "Eine Desktop-Verwaltung für deine Internet-Archive-Objekte und -Dateien.",
     privacy: "Datenschutz",
     privacyText: "Zugangsdaten bleiben auf diesem Rechner. Die App kommuniziert nur mit den offiziellen Internet-Archive-APIs über HTTPS.",
+    crashLog: "Absturzprotokoll-Ordner öffnen",
+    crashLogHelp: "Wenn die App unerwartet schließt, kann dieser Ordner eine Datei crash.log enthalten — schick sie uns, damit wir das Problem diagnostizieren können.",
   },
 
   faq: {

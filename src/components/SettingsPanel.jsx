@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Settings, KeyRound, Save, ExternalLink, Info, Globe, User, CheckCircle2,
-  ClipboardPaste, Eye, EyeOff, ShieldCheck, ShieldAlert, Plug, XCircle,
+  ClipboardPaste, Eye, EyeOff, ShieldCheck, ShieldAlert, Plug, XCircle, FileWarning,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from './ui/Toast';
@@ -195,6 +195,13 @@ const SettingsPanel = ({ credentials, setCredentials, version }) => {
                 {t('settings.privacyText')}
               </p>
             </div>
+            <button
+              className="btn-ghost text-xs mt-4"
+              onClick={() => window.electronAPI?.openCrashLogFolder?.()}
+              title={t('settings.crashLogHelp')}
+            >
+              <FileWarning className="w-3.5 h-3.5" />{t('settings.crashLog')}
+            </button>
           </div>
         </div>
       </div>
