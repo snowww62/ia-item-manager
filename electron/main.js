@@ -392,6 +392,18 @@ ipcMain.handle('credentials:isEncryptionAvailable', async () => {
 /* ------------------------------------------------------------------ */
 
 ipcMain.handle('ia:testConnection', async (event, { accessKey, secretKey }) => {
+  // xauthn (an email+password/cookie login service) turns out to reject
+  // *any* "Authorization: LOW key:secret" header with a blanket 400 -
+  // verified directly against archive.org with both obviously-fake keys and
+  // a user's freshly-copied real ones, identical result either way. It's
+  // simply the wrong endpoint for S3-style keys, not a credentials check.
+  // Meanwhile s3.us.archive.org (the endpoint uploads actually use) returns
+  // 200 for a bucket listing even with garbage credentials - archive.org
+  // doesn't appear to validate S3 keys on any lightweight read-only call,
+  // only once you try to actually write something. So there's no reliable
+  // way to hard-verify a key pair without side effects. Best-effort: if
+  // xauthn happens to return a screenname, show it (nice when it works);
+  // never claim a failure here means the keys are wrong.
   try {
     const res = await axiosInstance.get('https://archive.org/services/xauthn/', {
       params: { op: 'whoami' },
@@ -400,7 +412,7 @@ ipcMain.handle('ia:testConnection', async (event, { accessKey, secretKey }) => {
 
     const values = res.data?.values || {};
     if (res.data?.success === false) {
-      return { success: false, error: res.data?.error || 'Authentication failed' };
+      return { success: false, error: res.data?.error || 'Could not verify', errorCode: 'Unverifiable' };
     }
 
     return {
@@ -410,14 +422,7 @@ ipcMain.handle('ia:testConnection', async (event, { accessKey, secretKey }) => {
       itemname: values.itemname || null
     };
   } catch (error) {
-    const status = error.response?.status;
-    // Verified directly against archive.org: this endpoint answers a bad
-    // Access/Secret Key pair with a plain 400 "Bad Request" HTML page, not
-    // 401/403 like most APIs would - so 400 here means the same thing.
-    if (status === 400 || status === 401 || status === 403) {
-      return { success: false, error: 'Invalid credentials', errorCode: 'InvalidCredentials' };
-    }
-    return { success: false, error: error.message };
+    return { success: false, error: error.message, errorCode: 'Unverifiable' };
   }
 });
 

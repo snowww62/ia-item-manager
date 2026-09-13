@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Settings, KeyRound, Save, ExternalLink, Info, Globe, User, CheckCircle2,
-  ClipboardPaste, Eye, EyeOff, ShieldCheck, ShieldAlert, Plug, XCircle,
+  ClipboardPaste, Eye, EyeOff, ShieldCheck, ShieldAlert, Plug,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from './ui/Toast';
@@ -78,8 +78,7 @@ const SettingsPanel = ({ credentials, setCredentials, version, onGoToAbout }) =>
         setConn({ ok: true, name: res.screenname || res.email || '✓' });
         if (res.email && !iaEmail) setIaEmail(res.email);
       } else {
-        const msg = res.errorCode === 'InvalidCredentials' ? t('settings.invalidCredentials') : res.error;
-        setConn({ ok: false, error: msg });
+        setConn({ ok: false, unverifiable: res.errorCode === 'Unverifiable' });
       }
     } catch (err) {
       setConn({ ok: false, error: err.message });
@@ -160,9 +159,9 @@ const SettingsPanel = ({ credentials, setCredentials, version, onGoToAbout }) =>
                 {conn?.ok && <Badge tone="ok" icon={CheckCircle2}>{t('settings.connectedAs', { name: conn.name })}</Badge>}
               </div>
               {conn && !conn.ok && (
-                <p className="flex items-start gap-1.5 text-sm text-bad">
-                  <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  {conn.error || t('settings.connectionFailed')}
+                <p className={`flex items-start gap-1.5 text-sm ${conn.unverifiable ? 'text-ink-muted' : 'text-bad'}`}>
+                  <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                  {conn.unverifiable ? t('settings.connectionUnverifiable') : t('settings.connectionFailed')}
                 </p>
               )}
             </div>
