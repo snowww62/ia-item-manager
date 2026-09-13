@@ -1,10 +1,10 @@
 SHA256 Checksums - RetroVault Archive Manager v2.0.1
 
 RetroVault-Archive-Manager-Portable.exe:
-b609d4564749d53bf70d6ff6c88f275961e73672076f84f5f3cd920afaa4a6fb
+6b844f791e29fabcd2ef9de04a821c7f34011b71f24849bbb37f2a4d66ad46cf
 
 RetroVault-Archive-Manager-Setup.exe:
-174e2a9c2a4adce6bb81b088041f68e664c8b022d731d401c730e1ad50226f87
+8a04ac9337d6099be18195181ff469834a066b3f554f77613cc4c94cccdc19bc
 
 
 Regenerate after building (Windows):
@@ -21,3 +21,9 @@ The installer artifact name is fixed (RetroVault-Archive-Manager-Setup.exe, no
 spaces, no version number) via nsis.artifactName in package.json, matching the
 portable build, so the GitHub Pages site's direct download links stay valid
 across releases.
+
+Known issue: the portable .exe's self-extracting launcher does not always
+terminate all child processes when the window is closed (confirmed via
+testing - the installed/unpacked build closes cleanly, the portable one can
+leave background processes running). Prefer the installer if you hit
+unexplained memory pressure after repeated launches.
