@@ -1,9 +1,14 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu, shell, safeStorage } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, shell, safeStorage, crashReporter } = require('electron');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const https = require('https');
+
+// Captures native crashes (GPU/renderer process killed, out-of-memory, etc.)
+// that never reach JS-level handlers at all - keeps dumps on disk only,
+// nothing is ever uploaded anywhere.
+crashReporter.start({ uploadToServer: false, compress: true });
 
 let mainWindow;
 
@@ -107,6 +112,28 @@ function logCrash(label, err) {
 process.on('uncaughtException', (err) => logCrash('uncaughtException', err));
 process.on('unhandledRejection', (reason) => logCrash('unhandledRejection', reason));
 
+// Lightweight, always-on activity trail. Even when nothing above ever fires,
+// this shows the last thing that actually happened right before the app
+// disappeared (which file, what state, memory at the time) instead of
+// nothing at all - often more useful than a crash report.
+const activityLogPath = path.join(app.getPath('userData'), 'activity.log');
+const MAX_ACTIVITY_LOG_BYTES = 512 * 1024;
+
+function logActivity(line) {
+  try {
+    if (fs.existsSync(activityLogPath) && fs.statSync(activityLogPath).size > MAX_ACTIVITY_LOG_BYTES) {
+      fs.renameSync(activityLogPath, activityLogPath + '.old');
+    }
+    const mem = process.memoryUsage();
+    const memInfo = `rss=${Math.round(mem.rss / 1048576)}MB heap=${Math.round(mem.heapUsed / 1048576)}MB ext=${Math.round(mem.external / 1048576)}MB`;
+    fs.appendFileSync(activityLogPath, `[${new Date().toISOString()}] ${line} (${memInfo})\n`);
+  } catch {
+    /* best effort */
+  }
+}
+
+logActivity(`app starting (v${APP_VERSION})`);
+
 function sendToRenderer(channel, payload) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     try {
@@ -197,8 +224,12 @@ ipcMain.handle('shell:openExternal', async (event, url) => {
 
 ipcMain.handle('app:openCrashLogFolder', async () => {
   try {
-    if (fs.existsSync(crashLogPath)) {
-      shell.showItemInFolder(crashLogPath);
+    // activity.log always exists once at least one upload has run and is
+    // usually the more useful file (shows the last thing that happened);
+    // crash.log only exists if a JS-level exception was actually caught.
+    const preferred = fs.existsSync(crashLogPath) ? crashLogPath : activityLogPath;
+    if (fs.existsSync(preferred)) {
+      shell.showItemInFolder(preferred);
     } else {
       await shell.openPath(path.dirname(crashLogPath));
     }
@@ -208,7 +239,7 @@ ipcMain.handle('app:openCrashLogFolder', async () => {
   }
 });
 
-ipcMain.handle('app:hasCrashLog', () => fs.existsSync(crashLogPath));
+ipcMain.handle('app:hasCrashLog', () => fs.existsSync(crashLogPath) || fs.existsSync(activityLogPath));
 
 /* ------------------------------------------------------------------ */
 /*  Credentials (encrypted at rest via OS keychain)                    */
@@ -447,9 +478,10 @@ ipcMain.handle('ia:checkIdentifier', async (event, { identifier, userEmail }) =>
 /* ------------------------------------------------------------------ */
 
 ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, accessKey, secretKey, metadata, isExistingItem, sizeHint, queueDerive }) => {
+  const fileName = path.basename(filePath);
   try {
-    const fileName = path.basename(filePath);
     const fileSize = fs.statSync(filePath).size;
+    logActivity(`upload start: ${fileName} (${Math.round(fileSize / 1048576)}MB) -> ${identifier}`);
 
     let targetPath = fileName;
     if (targetFolder && targetFolder.trim()) {
@@ -515,9 +547,11 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
       });
     });
 
+    logActivity(`upload done: ${fileName}`);
     return { success: true, data: response.data };
   } catch (error) {
     const { code, message } = parseS3Error(error.response?.data, error.message);
+    logActivity(`upload FAILED: ${fileName}: ${code || ''} ${message}`);
     return { success: false, error: message, errorCode: code };
   }
 });
