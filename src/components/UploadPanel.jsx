@@ -168,16 +168,32 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
       // is streamed and shouldn't grow the app's own footprint. If it's
       // gotten critical, pause and let things settle before risking another
       // transfer instead of finding out via a crash.
+      //
+      // Threshold used to be a flat 1GB, which on a machine that normally
+      // idles around 2-4GB free (this one does) almost never triggered
+      // before things were already critical - a large file's own OS/TLS/
+      // network buffering needs real headroom on top of whatever's already
+      // running, proportional to its size, not a fixed floor. Still crashed
+      // on a 1.7GB file with only that flat check in place.
       try {
-        const mem = await window.electronAPI.getMemoryInfo?.();
-        if (mem && mem.freeBytes / 1024 ** 3 < 1) {
+        const fileGB = (file.size || 0) / 1024 ** 3;
+        const criticalGB = Math.max(2, fileGB * 2);
+        // Re-check after waiting instead of pausing once on a fixed timer
+        // and barreling through regardless - a single 20s wait doesn't mean
+        // anything actually freed up. Escalate like the archive.org backoff
+        // (30s, 60s, 90s...) up to a handful of attempts; if it truly never
+        // recovers, proceed anyway rather than block forever, but say so.
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const mem = await window.electronAPI.getMemoryInfo?.();
+          if (!mem || mem.freeBytes / 1024 ** 3 >= criticalGB) break;
           // window.gc() (via --expose-gc) is a *synchronous* full collection -
           // it freezes the whole window until it finishes, which on a large
           // heap can take seconds and looks exactly like a hang. Only worth
           // it here, where a pause is already happening and explained by the
           // banner - never as a silent side effect after every ordinary file.
           if (window.gc) window.gc();
-          await sleepWithCountdown(20, 'memory');
+          await sleepWithCountdown(30 * (attempt + 1), 'memory');
+          if (attempt === 4) toast.warning(t('upload.lowMemoryPersisting'));
         }
       } catch {
         /* advisory only */
