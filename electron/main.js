@@ -382,7 +382,7 @@ ipcMain.handle('ia:checkIdentifier', async (event, { identifier, userEmail }) =>
 ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, accessKey, secretKey, metadata, isExistingItem, sizeHint, queueDerive }) => {
   try {
     const fileName = path.basename(filePath);
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileSize = fs.statSync(filePath).size;
 
     let targetPath = fileName;
     if (targetFolder && targetFolder.trim()) {
@@ -393,6 +393,7 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
 
     const headers = {
       'Authorization': `LOW ${accessKey}:${secretKey}`,
+      'Content-Length': fileSize,
       'x-archive-interactive-priority': '1',
       'x-archive-auto-make-bucket': '1'
     };
@@ -423,10 +424,12 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
     const encodedPath = targetPath.split('/').map(segment => encodeURIComponent(segment)).join('/');
 
     const response = await retryOperation(async () => {
+      // A fresh stream per attempt: a Node Readable can only be consumed once,
+      // and retryOperation may call this more than once on transient errors.
       return await axiosInstance({
         method: 'put',
         url: `https://s3.us.archive.org/${identifier}/${encodedPath}`,
-        data: fileBuffer,
+        data: fs.createReadStream(filePath),
         headers: headers,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
@@ -452,10 +455,11 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
 ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey, secretKey, metadata }) => {
   try {
     const fileName = path.basename(filePath);
-    const fileBuffer = fs.readFileSync(filePath);
+    const fileSize = fs.statSync(filePath).size;
 
     const headers = {
       'Authorization': `LOW ${accessKey}:${secretKey}`,
+      'Content-Length': fileSize,
       'x-archive-interactive-priority': '1',
       'x-amz-auto-make-bucket': '1',
       'x-archive-meta01-collection': metadata?.collection || 'opensource_media',
@@ -473,7 +477,7 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
       return await axiosInstance({
         method: 'put',
         url: `https://s3.us.archive.org/${identifier}/${encodeURIComponent(fileName)}`,
-        data: fileBuffer,
+        data: fs.createReadStream(filePath),
         headers,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
