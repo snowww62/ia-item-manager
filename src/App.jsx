@@ -172,7 +172,7 @@ function AppContent() {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4 animate-fade-in">
-          <img src="/icon.png" alt="" className="w-14 h-14 rounded-xl shadow-glow" />
+          <img src="./icon.png" alt="" className="w-14 h-14 rounded-xl shadow-glow" />
           <div className="w-6 h-6 rounded-full border-2 border-brand/25 border-t-brand animate-spin" />
         </div>
       </div>

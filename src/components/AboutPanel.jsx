@@ -62,7 +62,7 @@ const AboutPanel = ({ version, onUpdateChecked }) => {
         <div className="max-w-2xl mx-auto space-y-5">
           {/* Hero */}
           <div className="card p-6 flex items-center gap-4">
-            <img src="/icon.png" alt="" className="w-14 h-14 rounded-xl shadow-glow shrink-0" />
+            <img src="./icon.png" alt="" className="w-14 h-14 rounded-xl shadow-glow shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-ink text-lg">{t('app.name')}</p>
               <p className="text-sm text-ink-muted">{t('settings.authorText')}</p>
