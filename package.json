@@ -1,6 +1,6 @@
 {
   "name": "ia-item-manager",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "RetroVault Archive Manager - a modern desktop app to manage your Internet Archive items and bulk-upload files",
   "main": "electron/main.js",
   "scripts": {

@@ -67,7 +67,7 @@ const AboutPanel = ({ version, onUpdateChecked }) => {
               <p className="font-semibold text-ink text-lg">{t('app.name')}</p>
               <p className="text-sm text-ink-muted">{t('settings.authorText')}</p>
             </div>
-            <Badge>v{version || '2.0.0'}</Badge>
+            <Badge>v{version || '2.0.1'}</Badge>
           </div>
 
           {/* Update check */}

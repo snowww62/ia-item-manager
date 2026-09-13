@@ -190,7 +190,7 @@ const SettingsPanel = ({ credentials, setCredentials, version, onGoToAbout }) =>
           >
             <div>
               <h3 className="font-semibold text-ink">{t('settings.about')}</h3>
-              <p className="text-xs text-ink-muted mt-1">{t('app.name')} · v{version || '2.0.0'}</p>
+              <p className="text-xs text-ink-muted mt-1">{t('app.name')} · v{version || '2.0.1'}</p>
             </div>
             <ExternalLink className="w-4 h-4 text-ink-faint" />
           </button>

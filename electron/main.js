@@ -13,7 +13,7 @@ crashReporter.start({ uploadToServer: false, compress: true });
 
 let mainWindow;
 
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 const USER_AGENT = `RetroVault-Archive-Manager/${APP_VERSION} (Desktop Application)`;
 
 // Kept short for quick calls (search, metadata, etc). File PUTs override this
