@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  FolderOpen, UploadCloud, Sparkles, HelpCircle, Settings,
+  FolderOpen, UploadCloud, Sparkles, HelpCircle, Settings, Info,
   PanelLeftClose, PanelLeftOpen, Archive,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected, version }) => {
+const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected, version, updateAvailable }) => {
   const { t } = useLanguage();
 
   const items = [
@@ -14,6 +14,7 @@ const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected,
     { id: 'create', icon: Sparkles, label: t('nav.create') },
     { id: 'faq', icon: HelpCircle, label: t('nav.faq') },
     { id: 'settings', icon: Settings, label: t('nav.settings') },
+    { id: 'about', icon: Info, label: t('nav.about'), badge: updateAvailable },
   ];
 
   return (
@@ -37,7 +38,7 @@ const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected,
 
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {items.map(({ id, icon: Icon, label }) => {
+        {items.map(({ id, icon: Icon, label, badge }) => {
           const active = currentView === id;
           return (
             <button
@@ -53,7 +54,12 @@ const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected,
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-full bg-brand" />
               )}
-              <Icon className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-brand' : ''}`} />
+              <span className="relative shrink-0">
+                <Icon className={`w-[18px] h-[18px] ${active ? 'text-brand' : ''}`} />
+                {badge && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-accent shadow-[0_0_6px] shadow-accent/70" />
+                )}
+              </span>
               {!collapsed && <span className="truncate">{label}</span>}
             </button>
           );

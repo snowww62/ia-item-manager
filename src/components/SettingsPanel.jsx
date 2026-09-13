@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Settings, KeyRound, Save, ExternalLink, Info, Globe, User, CheckCircle2,
-  ClipboardPaste, Eye, EyeOff, ShieldCheck, ShieldAlert, Plug, XCircle, FileWarning,
+  ClipboardPaste, Eye, EyeOff, ShieldCheck, ShieldAlert, Plug, XCircle,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from './ui/Toast';
@@ -29,7 +29,7 @@ const Field = ({ label, hint, children }) => (
   </label>
 );
 
-const SettingsPanel = ({ credentials, setCredentials, version }) => {
+const SettingsPanel = ({ credentials, setCredentials, version, onGoToAbout }) => {
   const { t, language: currentLang, changeLanguage } = useLanguage();
   const toast = useToast();
 
@@ -184,25 +184,16 @@ const SettingsPanel = ({ credentials, setCredentials, version }) => {
           </button>
 
           {/* About */}
-          <div className="card p-6">
-            <h3 className="font-semibold text-ink mb-3">{t('settings.about')}</h3>
-            <div className="space-y-1.5 text-sm text-ink-muted">
-              <p><span className="text-ink-faint">{t('settings.version')}:</span> {version || '2.0.0'}</p>
-              <p><span className="text-ink-faint">{t('settings.author')}:</span> {t('settings.authorText')}</p>
-              <p><span className="text-ink-faint">{t('settings.description')}:</span> {t('settings.descriptionText')}</p>
-              <p className="pt-3 mt-2 border-t border-line text-ink-faint">
-                <ShieldCheck className="w-4 h-4 inline mr-1.5 -mt-0.5 text-ok" />
-                {t('settings.privacyText')}
-              </p>
+          <button
+            onClick={onGoToAbout}
+            className="w-full card p-6 flex items-center justify-between hover:border-line-strong hover:bg-surface-hover transition-colors text-left"
+          >
+            <div>
+              <h3 className="font-semibold text-ink">{t('settings.about')}</h3>
+              <p className="text-xs text-ink-muted mt-1">{t('app.name')} · v{version || '2.0.0'}</p>
             </div>
-            <button
-              className="btn-ghost text-xs mt-4"
-              onClick={() => window.electronAPI?.openCrashLogFolder?.()}
-              title={t('settings.crashLogHelp')}
-            >
-              <FileWarning className="w-3.5 h-3.5" />{t('settings.crashLog')}
-            </button>
-          </div>
+            <ExternalLink className="w-4 h-4 text-ink-faint" />
+          </button>
         </div>
       </div>
     </div>

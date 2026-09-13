@@ -232,6 +232,44 @@ app.on('activate', () => {
 
 ipcMain.handle('app:getVersion', () => APP_VERSION);
 
+const GITHUB_REPO = 'snowww62/ia-item-manager';
+
+function compareVersions(a, b) {
+  const pa = String(a).replace(/^v/i, '').split('.').map((n) => parseInt(n, 10) || 0);
+  const pb = String(b).replace(/^v/i, '').split('.').map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] || 0) - (pb[i] || 0);
+    if (diff !== 0) return diff > 0 ? 1 : -1;
+  }
+  return 0;
+}
+
+ipcMain.handle('app:checkForUpdate', async () => {
+  try {
+    const res = await axiosInstance.get(
+      `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
+      { headers: { Accept: 'application/vnd.github+json' } }
+    );
+    const latestVersion = (res.data?.tag_name || '').replace(/^v/i, '');
+    const assets = res.data?.assets || [];
+    const portable = assets.find((a) => /portable/i.test(a.name));
+    const setup = assets.find((a) => /setup/i.test(a.name));
+
+    return {
+      success: true,
+      currentVersion: APP_VERSION,
+      latestVersion,
+      hasUpdate: Boolean(latestVersion) && compareVersions(latestVersion, APP_VERSION) > 0,
+      releaseUrl: res.data?.html_url || `https://github.com/${GITHUB_REPO}/releases/latest`,
+      portableUrl: portable?.browser_download_url,
+      setupUrl: setup?.browser_download_url,
+      notes: res.data?.body || ''
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
 ipcMain.handle('shell:openExternal', async (event, url) => {
   if (typeof url === 'string' && /^https?:\/\//.test(url)) {
     await shell.openExternal(url);

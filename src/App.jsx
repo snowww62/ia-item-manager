@@ -10,8 +10,9 @@ import SettingsPanel from './components/SettingsPanel';
 import ItemDetailsPanel from './components/ItemDetailsPanel';
 import FAQPanel from './components/FAQPanel';
 import CreateItemPanel from './components/CreateItemPanel';
+import AboutPanel from './components/AboutPanel';
 
-const NAV_ORDER = ['items', 'upload', 'create', 'faq', 'settings'];
+const NAV_ORDER = ['items', 'upload', 'create', 'faq', 'settings', 'about'];
 
 function AppContent() {
   const [currentView, setCurrentView] = useState('items');
@@ -20,6 +21,7 @@ function AppContent() {
   const [uploadToItem, setUploadToItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [version, setVersion] = useState('');
+  const [updateAvailable, setUpdateAvailable] = useState(false);
   const [collapsed, setCollapsed] = useState(
     () => localStorage.getItem('app-sidebar-collapsed') === 'true'
   );
@@ -27,6 +29,11 @@ function AppContent() {
   useEffect(() => {
     loadCredentials();
     window.electronAPI?.getVersion?.().then(setVersion).catch(() => {});
+    // Silent, once per launch - AboutPanel shows the details and lets the
+    // user re-check on demand; this just lights up the sidebar badge.
+    window.electronAPI?.checkForUpdate?.()
+      .then((res) => { if (res?.success && res.hasUpdate) setUpdateAvailable(true); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -38,7 +45,7 @@ function AppContent() {
     const onKey = (e) => {
       const mod = e.ctrlKey || e.metaKey;
       if (!mod) return;
-      if (e.key >= '1' && e.key <= '5') {
+      if (e.key >= '1' && e.key <= '6') {
         e.preventDefault();
         setCurrentView(NAV_ORDER[Number(e.key) - 1]);
       } else if (e.key.toLowerCase() === 'k') {
@@ -128,7 +135,21 @@ function AppContent() {
       case 'items':
         return <ItemsPanel credentials={credentials} onSelectItem={goToItem} onGoToSettings={() => setCurrentView('settings')} />;
       case 'settings':
-        return <SettingsPanel credentials={credentials} setCredentials={saveCredentials} version={version} />;
+        return (
+          <SettingsPanel
+            credentials={credentials}
+            setCredentials={saveCredentials}
+            version={version}
+            onGoToAbout={() => setCurrentView('about')}
+          />
+        );
+      case 'about':
+        return (
+          <AboutPanel
+            version={version}
+            onUpdateChecked={(res) => setUpdateAvailable(Boolean(res?.success && res.hasUpdate))}
+          />
+        );
       case 'details':
         return (
           <ItemDetailsPanel
@@ -173,6 +194,7 @@ function AppContent() {
         onToggleCollapse={() => setCollapsed((c) => !c)}
         connected={connected}
         version={version}
+        updateAvailable={updateAvailable}
       />
       <main className="relative z-10 flex-1 min-w-0 overflow-hidden">{renderView()}</main>
     </div>

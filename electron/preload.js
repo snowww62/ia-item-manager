@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer, webUtils } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // App / system
   getVersion: () => ipcRenderer.invoke('app:getVersion'),
+  checkForUpdate: () => ipcRenderer.invoke('app:checkForUpdate'),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),
   openCrashLogFolder: () => ipcRenderer.invoke('app:openCrashLogFolder'),
   hasCrashLog: () => ipcRenderer.invoke('app:hasCrashLog'),
