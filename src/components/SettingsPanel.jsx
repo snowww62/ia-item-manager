@@ -78,7 +78,8 @@ const SettingsPanel = ({ credentials, setCredentials, version, onGoToAbout }) =>
         setConn({ ok: true, name: res.screenname || res.email || '✓' });
         if (res.email && !iaEmail) setIaEmail(res.email);
       } else {
-        setConn({ ok: false, error: res.error });
+        const msg = res.errorCode === 'InvalidCredentials' ? t('settings.invalidCredentials') : res.error;
+        setConn({ ok: false, error: msg });
       }
     } catch (err) {
       setConn({ ok: false, error: err.message });
@@ -150,13 +151,20 @@ const SettingsPanel = ({ credentials, setCredentials, version, onGoToAbout }) =>
               </div>
             </Field>
 
-            <div className="flex items-center gap-3 pt-1">
-              <button className="btn-ghost" onClick={testConnection} disabled={testing || !local.accessKey || !local.secretKey}>
-                {testing ? <Spinner size="sm" /> : <Plug className="w-4 h-4" />}
-                {testing ? t('settings.testing') : t('settings.testConnection')}
-              </button>
-              {conn?.ok && <Badge tone="ok" icon={CheckCircle2}>{t('settings.connectedAs', { name: conn.name })}</Badge>}
-              {conn && !conn.ok && <Badge tone="bad" icon={XCircle}>{conn.error || t('settings.connectionFailed')}</Badge>}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center gap-3">
+                <button className="btn-ghost" onClick={testConnection} disabled={testing || !local.accessKey || !local.secretKey}>
+                  {testing ? <Spinner size="sm" /> : <Plug className="w-4 h-4" />}
+                  {testing ? t('settings.testing') : t('settings.testConnection')}
+                </button>
+                {conn?.ok && <Badge tone="ok" icon={CheckCircle2}>{t('settings.connectedAs', { name: conn.name })}</Badge>}
+              </div>
+              {conn && !conn.ok && (
+                <p className="flex items-start gap-1.5 text-sm text-bad">
+                  <XCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  {conn.error || t('settings.connectionFailed')}
+                </p>
+              )}
             </div>
 
             <div className={`flex items-center gap-2 text-xs ${encAvailable ? 'text-ink-muted' : 'text-warn'}`}>

@@ -411,8 +411,11 @@ ipcMain.handle('ia:testConnection', async (event, { accessKey, secretKey }) => {
     };
   } catch (error) {
     const status = error.response?.status;
-    if (status === 401 || status === 403) {
-      return { success: false, error: 'Invalid credentials' };
+    // Verified directly against archive.org: this endpoint answers a bad
+    // Access/Secret Key pair with a plain 400 "Bad Request" HTML page, not
+    // 401/403 like most APIs would - so 400 here means the same thing.
+    if (status === 400 || status === 401 || status === 403) {
+      return { success: false, error: 'Invalid credentials', errorCode: 'InvalidCredentials' };
     }
     return { success: false, error: error.message };
   }
