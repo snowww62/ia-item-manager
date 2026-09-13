@@ -1,10 +1,10 @@
 SHA256 Checksums - IA Item Manager v2.0.0
 
 IA-Item-Manager-Portable.exe:
-32f10e3130f108cf23d4110cf4d958f64be505d9953e5876a0a758e6068db0bd
+f2320d0c506e913e43941acbfbcb160418a8398280fa1c6b3c40e83b0eff5a0e
 
 IA-Item-Manager-Setup.exe:
-1a77bd624318e1289780d1d5c5f0874dd8ccc56b85f452e7f0342c6bcb0eb690
+ddf4399958b9f020ed9f325ce59c281b1b38d0121d6a512ca62e68a2fa69a2b1
 
 
 Regenerate after building (Windows):
