@@ -22,14 +22,16 @@ crashReporter.start({ uploadToServer: false, compress: true });
 // called before app.whenReady().
 app.disableHardwareAcceleration();
 
-// Exposes global.gc() here in the main process AND window.gc() in the
-// renderer (it's a Chromium/V8 flag, applies to every JS context this app
-// spawns). Buffers from a finished upload are eligible for collection the
-// moment the request settles, but V8's own scheduler decides *when* to
-// actually reclaim them, and under memory pressure that can lag behind
-// allocation. Forcing a GC pass right after each file (see ia:upload below,
-// and the renderer side in UploadPanel) reclaims it immediately instead of
-// hoping V8 gets to it before the next large file starts.
+// Exposes window.gc() in the renderer (appendSwitch only affects processes
+// spawned after this point, which the renderer is). It does NOT expose
+// global.gc() in this already-running main process - that would need
+// --expose-gc present at this process's own V8 startup, which is only
+// achievable by relaunching with the flag baked into the launch args.
+// Tried that; it broke startup on the portable build (self-extracting
+// launcher didn't relaunch cleanly), so it's not worth the risk for what
+// the main process barely needs anyway - it only ever holds one file's
+// stream open at a time, no large buffers to reclaim. forceGc() below is a
+// no-op there and that's fine; the renderer side is what benefits.
 app.commandLine.appendSwitch('js-flags', '--expose-gc');
 
 let mainWindow;
