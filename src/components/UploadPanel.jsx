@@ -171,6 +171,12 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
       try {
         const mem = await window.electronAPI.getMemoryInfo?.();
         if (mem && mem.freeBytes / 1024 ** 3 < 1) {
+          // window.gc() (via --expose-gc) is a *synchronous* full collection -
+          // it freezes the whole window until it finishes, which on a large
+          // heap can take seconds and looks exactly like a hang. Only worth
+          // it here, where a pause is already happening and explained by the
+          // banner - never as a silent side effect after every ordinary file.
+          if (window.gc) window.gc();
           await sleepWithCountdown(20, 'memory');
         }
       } catch {
@@ -204,12 +210,6 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
         fail++;
         setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'failed', error: err.message, speed: '' } : f)));
       }
-
-      // --expose-gc (set in main.js) exposes this here too. Reclaim whatever
-      // this file's progress-event closures/IPC payloads left behind right
-      // away instead of leaving it for V8's own scheduling, which under
-      // memory pressure can lag behind a queue of large files.
-      if (window.gc) window.gc();
 
       if (rateLimited && !warnedRateLimit) {
         warnedRateLimit = true;
