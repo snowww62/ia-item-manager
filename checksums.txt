@@ -1,10 +1,10 @@
-SHA256 Checksums - RetroVault Archive Manager v2.0.0
+SHA256 Checksums - RetroVault Archive Manager v2.0.1
 
 RetroVault-Archive-Manager-Portable.exe:
-81d99946e08bd009a02df414e01fa0c1deff427a60c6019bfaf5d4cee079dcdc
+c77d60b040e363d434dc2a137cd3bffdcb7a9e9f17cf2b071ad495d8eb94d4b9
 
 RetroVault-Archive-Manager-Setup.exe:
-6e07dacf15dfe3819fc6eff494dbd7bae5c1219ec2542a55d78e80c991a09092
+712b6f78dfb5b5a1dca98cf746627791204b30bf9765a0a54328ab27c4d617c1
 
 
 Regenerate after building (Windows):
