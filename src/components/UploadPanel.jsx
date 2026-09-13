@@ -119,9 +119,9 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
 
   const folderValid = FOLDER_RE.test(targetFolder.trim());
 
-  const sleepWithCountdown = async (totalSeconds, streakNum) => {
+  const sleepWithCountdown = async (totalSeconds, reason = 'rateLimit') => {
     for (let s = totalSeconds; s > 0; s--) {
-      setPause({ seconds: s, streak: streakNum });
+      setPause({ seconds: s, reason });
       await new Promise((r) => setTimeout(r, 1000));
     }
     setPause(null);
@@ -161,6 +161,22 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
 
     for (let i = 0; i < targets.length; i++) {
       const file = targets[i];
+
+      // Re-check live free memory before every file, not just once at the
+      // start of the batch - a long queue can bleed a machine's headroom
+      // down gradually (other apps, the OS itself) even though each upload
+      // is streamed and shouldn't grow the app's own footprint. If it's
+      // gotten critical, pause and let things settle before risking another
+      // transfer instead of finding out via a crash.
+      try {
+        const mem = await window.electronAPI.getMemoryInfo?.();
+        if (mem && mem.freeBytes / 1024 ** 3 < 1) {
+          await sleepWithCountdown(20, 'memory');
+        }
+      } catch {
+        /* advisory only */
+      }
+
       setFiles((list) => list.map((f) => (f.path === file.path ? { ...f, status: 'uploading', progress: 0, error: '', errorCode: null } : f)));
       let rateLimited = false;
       try {
@@ -201,7 +217,7 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
           // hammering it every 2s, which just adds to the congestion.
           streak += 1;
           const seconds = Math.min(30 * 2 ** (streak - 1), 300);
-          await sleepWithCountdown(seconds, streak);
+          await sleepWithCountdown(seconds, 'rateLimit');
         } else {
           await new Promise((r) => setTimeout(r, 2000));
         }
@@ -267,12 +283,12 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
             </div>
           </div>
 
-          {/* Congestion pause banner */}
+          {/* Pause banner - congestion or low-memory cooldown */}
           {pause && (
             <div className="flex items-center gap-3 px-4 py-3 bg-warn/10 border border-warn/25 rounded-sm animate-slide-up">
               <Loader className="w-4 h-4 text-warn animate-spin shrink-0" />
               <p className="text-sm text-warn">
-                {t('upload.pausing', { seconds: pause.seconds })}
+                {t(pause.reason === 'memory' ? 'upload.pausingMemory' : 'upload.pausing', { seconds: pause.seconds })}
               </p>
             </div>
           )}

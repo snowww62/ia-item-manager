@@ -11,6 +11,17 @@ const os = require('os');
 // nothing is ever uploaded anywhere.
 crashReporter.start({ uploadToServer: false, compress: true });
 
+// This is a file-manager UI, not anything graphics-intensive - GPU
+// compositing buys nothing here but costs a whole extra process (with its
+// own baseline memory footprint) on every launch. On a machine that's
+// already low on RAM that overhead can be the difference between the app
+// surviving a big upload and V8 hitting a fatal out-of-memory abort (see
+// the crash dumps from the v2.0.0/v2.0.1 reports - both the main and
+// renderer process died from memory pressure, not from the upload code
+// itself, which already streams files instead of buffering them). Must be
+// called before app.whenReady().
+app.disableHardwareAcceleration();
+
 let mainWindow;
 
 const APP_VERSION = '2.0.1';
@@ -183,6 +194,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      spellcheck: false, // no free-text authoring here worth loading dictionaries into memory for
       preload: path.join(__dirname, 'preload.js')
     },
     backgroundColor: '#0b0d12',
