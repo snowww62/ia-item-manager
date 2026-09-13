@@ -1,4 +1,4 @@
-# IA Item Manager
+# RetroVault Archive Manager
 
 A modern desktop app to **manage your Internet Archive items** and **bulk‑upload files** to them.
 
@@ -13,7 +13,8 @@ A modern desktop app to **manage your Internet Archive items** and **bulk‑uplo
 - **Item details** — overview / files / metadata / raw tabs, per‑file source badges, copy download links, whole‑item ZIP download.
 - **archive.org integration** — connection test (shows your screen name), processing/task status, one‑click re‑derivation, full metadata editor (title, description, subject, creator, date, license, language, media type).
 - **New item** — create an item straight from the app (advanced, gated behind a spam‑risk warning).
-- **Polish** — dark modern UI, in‑app toasts and confirm dialogs (no more browser `alert()`), collapsible sidebar, keyboard shortcuts (`Ctrl/⌘ + 1–5`, `Ctrl/⌘ + K`).
+- **Update check** — checks this repo's latest release on launch and points you to the download if there's a newer one.
+- **Polish** — dark modern UI, in‑app toasts and confirm dialogs (no more browser `alert()`), collapsible sidebar, keyboard shortcuts (`Ctrl/⌘ + 1–6`, `Ctrl/⌘ + K`).
 - **4 languages** — English, Français, Español, Deutsch.
 
 ## 🔐 Security
@@ -26,7 +27,7 @@ A modern desktop app to **manage your Internet Archive items** and **bulk‑uplo
 
 1. Create your first item on [archive.org/upload](https://archive.org/upload/) (one‑time — or use the in‑app **New item** panel).
 2. Get your keys at [archive.org/account/s3.php](https://archive.org/account/s3.php).
-3. Launch IA Item Manager → **Settings** → paste your Access Key & Secret Key, add your IA email, hit **Test connection**.
+3. Launch RetroVault Archive Manager → **Settings** → paste your Access Key & Secret Key, add your IA email, hit **Test connection**.
 4. **My items** → pick an item → **Add files** → drop files → upload.
 
 ## 🛠️ Development
@@ -43,7 +44,7 @@ npm run build
 npm run package
 ```
 
-Executables land in `build_output/` (`IA-Item-Manager-Portable.exe` and the installer).
+Executables land in `build_output/` (`RetroVault-Archive-Manager-Portable.exe` and the installer).
 
 ## 📄 License
 

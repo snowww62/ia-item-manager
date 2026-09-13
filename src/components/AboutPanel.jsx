@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Info, ExternalLink, Github, Bug, ShieldCheck, FileWarning, RefreshCw,
-  CheckCircle2, ArrowDownToLine, Archive, Scale,
+  CheckCircle2, ArrowDownToLine, Scale,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useToast } from './ui/Toast';
@@ -62,9 +62,7 @@ const AboutPanel = ({ version, onUpdateChecked }) => {
         <div className="max-w-2xl mx-auto space-y-5">
           {/* Hero */}
           <div className="card p-6 flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-brand to-accent flex items-center justify-center shadow-glow shrink-0">
-              <Archive className="w-7 h-7 text-white" />
-            </div>
+            <img src="/icon.png" alt="" className="w-14 h-14 rounded-xl shadow-glow shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-ink text-lg">{t('app.name')}</p>
               <p className="text-sm text-ink-muted">{t('settings.authorText')}</p>

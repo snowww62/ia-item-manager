@@ -14,7 +14,7 @@ crashReporter.start({ uploadToServer: false, compress: true });
 let mainWindow;
 
 const APP_VERSION = '2.0.0';
-const USER_AGENT = `IA-Item-Manager/${APP_VERSION} (Desktop Application)`;
+const USER_AGENT = `RetroVault-Archive-Manager/${APP_VERSION} (Desktop Application)`;
 
 // Kept short for quick calls (search, metadata, etc). File PUTs override this
 // per-request with timeout: 0 - a 60s ceiling would abort any upload of a
@@ -98,7 +98,9 @@ function parseS3Error(data, fallbackMessage) {
 // on a request/file stream when a slow upload is aborted), Node's default
 // behaviour is to kill the whole process with no trace. Log it instead so a
 // silent "the app just closed" can actually be diagnosed from
-// %APPDATA%/IA Item Manager/crash.log.
+// %APPDATA%/ia-item-manager/crash.log (userData path - keyed to package.json's
+// "name", which stays fixed across rebrands so existing saved credentials
+// and this log history keep working across app renames).
 const crashLogPath = path.join(app.getPath('userData'), 'crash.log');
 
 function logCrash(label, err) {

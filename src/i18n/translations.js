@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 
 const en = {
-  app: { name: "IA Item Manager", tagline: "Internet Archive manager" },
+  app: { name: "RetroVault Archive Manager", tagline: "Internet Archive manager" },
 
   nav: {
     items: "My items",
@@ -263,14 +263,14 @@ const en = {
 
   faq: {
     title: "Help & FAQ",
-    subtitle: "Everything about using IA Item Manager",
+    subtitle: "Everything about using RetroVault Archive Manager",
     search: "Search the FAQ…",
     noMatch: "Nothing matches your search.",
     links: "Useful links",
     linkApiKeys: "Get your API keys",
     linkDocs: "Internet Archive API docs",
     linkGeneralFaq: "Internet Archive general FAQ",
-    madeBy: "IA Item Manager",
+    madeBy: "RetroVault Archive Manager",
     questions: [
       { question: "How do I get my Internet Archive API keys?", answer: "Open archive.org/account/s3.php while signed in. Copy the Access Key and Secret Key into Settings." },
       { question: "What is an identifier?", answer: "The unique name of an item, used in its URL (archive.org/details/<identifier>). Lowercase letters, numbers, hyphens and underscores only." },
@@ -287,7 +287,7 @@ const en = {
 };
 
 const fr = {
-  app: { name: "IA Item Manager", tagline: "Gestionnaire Internet Archive" },
+  app: { name: "RetroVault Archive Manager", tagline: "Gestionnaire Internet Archive" },
 
   nav: {
     items: "Mes items",
@@ -549,14 +549,14 @@ const fr = {
 
   faq: {
     title: "Aide & FAQ",
-    subtitle: "Tout sur l'utilisation d'IA Item Manager",
+    subtitle: "Tout sur l'utilisation de RetroVault Archive Manager",
     search: "Rechercher dans la FAQ…",
     noMatch: "Aucun résultat pour votre recherche.",
     links: "Liens utiles",
     linkApiKeys: "Obtenir vos clés API",
     linkDocs: "Documentation de l'API Internet Archive",
     linkGeneralFaq: "FAQ générale d'Internet Archive",
-    madeBy: "IA Item Manager",
+    madeBy: "RetroVault Archive Manager",
     questions: [
       { question: "Comment obtenir mes clés API Internet Archive ?", answer: "Ouvrez archive.org/account/s3.php en étant connecté. Copiez la clé d'accès et la clé secrète dans les Réglages." },
       { question: "Qu'est-ce qu'un identifiant ?", answer: "Le nom unique d'un item, utilisé dans son URL (archive.org/details/<identifiant>). Minuscules, chiffres, tirets et underscores uniquement." },
@@ -573,7 +573,7 @@ const fr = {
 };
 
 const es = {
-  app: { name: "IA Item Manager", tagline: "Gestor de Internet Archive" },
+  app: { name: "RetroVault Archive Manager", tagline: "Gestor de Internet Archive" },
 
   nav: {
     items: "Mis ítems",
@@ -835,14 +835,14 @@ const es = {
 
   faq: {
     title: "Ayuda y FAQ",
-    subtitle: "Todo sobre el uso de IA Item Manager",
+    subtitle: "Todo sobre el uso de RetroVault Archive Manager",
     search: "Buscar en la FAQ…",
     noMatch: "Nada coincide con tu búsqueda.",
     links: "Enlaces útiles",
     linkApiKeys: "Obtener tus claves API",
     linkDocs: "Documentación de la API de Internet Archive",
     linkGeneralFaq: "FAQ general de Internet Archive",
-    madeBy: "IA Item Manager",
+    madeBy: "RetroVault Archive Manager",
     questions: [
       { question: "¿Cómo obtengo mis claves API de Internet Archive?", answer: "Abre archive.org/account/s3.php con la sesión iniciada. Copia la Access Key y la Secret Key en Ajustes." },
       { question: "¿Qué es un identificador?", answer: "El nombre único de un ítem, usado en su URL (archive.org/details/<identificador>). Solo minúsculas, números, guiones y guiones bajos." },
@@ -859,7 +859,7 @@ const es = {
 };
 
 const de = {
-  app: { name: "IA Item Manager", tagline: "Internet-Archive-Verwaltung" },
+  app: { name: "RetroVault Archive Manager", tagline: "Internet-Archive-Verwaltung" },
 
   nav: {
     items: "Meine Objekte",
@@ -1121,14 +1121,14 @@ const de = {
 
   faq: {
     title: "Hilfe & FAQ",
-    subtitle: "Alles zur Nutzung von IA Item Manager",
+    subtitle: "Alles zur Nutzung von RetroVault Archive Manager",
     search: "FAQ durchsuchen…",
     noMatch: "Nichts passt zu deiner Suche.",
     links: "Nützliche Links",
     linkApiKeys: "API-Schlüssel holen",
     linkDocs: "Internet-Archive-API-Doku",
     linkGeneralFaq: "Allgemeine Internet-Archive-FAQ",
-    madeBy: "IA Item Manager",
+    madeBy: "RetroVault Archive Manager",
     questions: [
       { question: "Wie bekomme ich meine Internet-Archive-API-Schlüssel?", answer: "Öffne archive.org/account/s3.php angemeldet. Kopiere Access Key und Secret Key in die Einstellungen." },
       { question: "Was ist eine Kennung?", answer: "Der eindeutige Name eines Objekts, Teil seiner URL (archive.org/details/<Kennung>). Nur Kleinbuchstaben, Ziffern, Binde- und Unterstriche." },

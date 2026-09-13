@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Archive } from 'lucide-react';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ToastProvider } from './components/ui/Toast';
 import { ConfirmProvider } from './components/ui/Confirm';
@@ -173,9 +172,7 @@ function AppContent() {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4 animate-fade-in">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-brand to-accent flex items-center justify-center shadow-glow">
-            <Archive className="w-7 h-7 text-white" />
-          </div>
+          <img src="/icon.png" alt="" className="w-14 h-14 rounded-xl shadow-glow" />
           <div className="w-6 h-6 rounded-full border-2 border-brand/25 border-t-brand animate-spin" />
         </div>
       </div>

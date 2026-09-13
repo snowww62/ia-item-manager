@@ -1,6 +1,6 @@
 @echo off
 echo ================================================
-echo    Building IA Item Manager for Windows
+echo    Building RetroVault Archive Manager for Windows
 echo ================================================
 echo.
 
@@ -36,9 +36,9 @@ echo    BUILD COMPLETED SUCCESSFULLY!
 echo ================================================
 echo.
 echo Your executable files are in the "build_output" folder:
-echo   - IA-Item-Manager-Portable.exe (double-click to run, no install needed)
-echo   - IA-Item-Manager-Setup.exe (installer version)
+echo   - RetroVault-Archive-Manager-Portable.exe (double-click to run, no install needed)
+echo   - RetroVault-Archive-Manager-Setup.exe (installer version)
 echo.
-echo You can share IA-Item-Manager-Portable.exe with others!
+echo You can share RetroVault-Archive-Manager-Portable.exe with others!
 echo.
 pause

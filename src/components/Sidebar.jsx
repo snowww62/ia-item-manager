@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   FolderOpen, UploadCloud, Sparkles, HelpCircle, Settings, Info,
-  PanelLeftClose, PanelLeftOpen, Archive,
+  PanelLeftClose, PanelLeftOpen,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -25,9 +25,7 @@ const Sidebar = ({ currentView, setView, collapsed, onToggleCollapse, connected,
     >
       {/* Brand */}
       <div className={`flex items-center gap-3 h-[68px] px-4 border-b border-line ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand to-accent flex items-center justify-center shadow-glow shrink-0">
-          <Archive className="w-5 h-5 text-white" />
-        </div>
+        <img src="/icon.png" alt="" className="w-9 h-9 rounded-lg shadow-glow shrink-0" />
         {!collapsed && (
           <div className="min-w-0">
             <p className="font-semibold text-ink leading-tight truncate">{t('app.name')}</p>

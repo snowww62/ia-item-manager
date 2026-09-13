@@ -1,7 +1,7 @@
 {
   "name": "ia-item-manager",
   "version": "2.0.0",
-  "description": "A modern desktop app to manage your Internet Archive items and bulk-upload files",
+  "description": "RetroVault Archive Manager - a modern desktop app to manage your Internet Archive items and bulk-upload files",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
@@ -10,7 +10,7 @@
     "build": "vite build",
     "package": "electron-builder"
   },
-  "keywords": ["internet-archive", "electron", "react", "file-manager", "archive-org"],
+  "keywords": ["internet-archive", "electron", "react", "file-manager", "archive-org", "retro-gaming"],
   "author": "Snow",
   "license": "MIT",
   "dependencies": {
@@ -33,7 +33,7 @@
   },
   "build": {
     "appId": "com.iaitemmanager.app",
-    "productName": "IA Item Manager",
+    "productName": "RetroVault Archive Manager",
     "files": [
       "dist/**/*",
       "electron/**/*"
@@ -57,16 +57,16 @@
       "perMachine": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "IA Item Manager",
+      "shortcutName": "RetroVault Archive Manager",
       "allowElevation": false,
       "installerIcon": "public/icon.ico",
       "uninstallerIcon": "public/icon.ico",
       "deleteAppDataOnUninstall": true,
-      "artifactName": "IA-Item-Manager-Setup.exe"
+      "artifactName": "RetroVault-Archive-Manager-Setup.exe"
     },
     "publish": null,
     "portable": {
-      "artifactName": "IA-Item-Manager-Portable.exe"
+      "artifactName": "RetroVault-Archive-Manager-Portable.exe"
     },
     "directories": {
       "output": "build_output"
