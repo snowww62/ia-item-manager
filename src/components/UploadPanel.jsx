@@ -132,6 +132,26 @@ const UploadPanel = ({ credentials, prefilledIdentifier, onGoToItems }) => {
       toast.error(t('upload.fillRequired'));
       return;
     }
+
+    // Large files on a machine already low on RAM is a real way to crash the
+    // app (confirmed via crash dumps: V8's own out-of-memory exception fired
+    // in both the main and renderer processes while a 1.7GB upload was
+    // running with under 5GB free). Warn up front instead of finding out
+    // mid-batch - streaming keeps the app's own footprint low, but the OS,
+    // network stack and everything else on the machine still need headroom.
+    try {
+      const mem = await window.electronAPI.getMemoryInfo?.();
+      if (mem) {
+        const freeGB = mem.freeBytes / 1024 ** 3;
+        const largestGB = Math.max(...targets.map((f) => f.size || 0)) / 1024 ** 3;
+        if (freeGB < 3 || freeGB < largestGB * 2) {
+          toast.warning(t('upload.lowMemory', { free: freeGB.toFixed(1) }), { duration: 9000 });
+        }
+      }
+    } catch {
+      /* advisory only - never block an upload over this */
+    }
+
     setUploading(true);
     const totalSize = files.reduce((s, f) => s + (f.size || 0), 0);
     let ok = 0;

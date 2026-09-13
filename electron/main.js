@@ -4,6 +4,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const https = require('https');
+const os = require('os');
 
 // Captures native crashes (GPU/renderer process killed, out-of-memory, etc.)
 // that never reach JS-level handlers at all - keeps dumps on disk only,
@@ -125,7 +126,7 @@ function logActivity(line) {
       fs.renameSync(activityLogPath, activityLogPath + '.old');
     }
     const mem = process.memoryUsage();
-    const memInfo = `rss=${Math.round(mem.rss / 1048576)}MB heap=${Math.round(mem.heapUsed / 1048576)}MB ext=${Math.round(mem.external / 1048576)}MB`;
+    const memInfo = `rss=${Math.round(mem.rss / 1048576)}MB heap=${Math.round(mem.heapUsed / 1048576)}MB ext=${Math.round(mem.external / 1048576)}MB sysFree=${Math.round(os.freemem() / 1048576)}MB`;
     fs.appendFileSync(activityLogPath, `[${new Date().toISOString()}] ${line} (${memInfo})\n`);
   } catch {
     /* best effort */
@@ -142,6 +143,23 @@ function sendToRenderer(channel, payload) {
       logCrash(`sendToRenderer(${channel})`, err);
     }
   }
+}
+
+// axios's Node onUploadProgress fires on essentially every TCP write, which
+// for a large file over a fast connection is thousands of times a second.
+// Each one is a cross-process IPC message with its own serialization/Mojo
+// overhead; a burst like that is exactly what showed up as a renderer-side
+// V8 out-of-memory crash (exception 0xE0000008) while uploading a 1.7GB
+// file. Throttling *inside the renderer* wasn't enough - it only skipped
+// the React re-render, not the IPC traffic itself. Gate it at the source.
+const lastProgressSent = {};
+function sendProgressThrottled(fileName, payload) {
+  const now = Date.now();
+  const isDone = payload.progress >= 100;
+  if (!isDone && now - (lastProgressSent[fileName] || 0) < 150) return;
+  lastProgressSent[fileName] = now;
+  if (isDone) delete lastProgressSent[fileName];
+  sendToRenderer('upload-progress', payload);
 }
 
 // A plain fs.createReadStream() left to itself will emit an unhandled
@@ -240,6 +258,16 @@ ipcMain.handle('app:openCrashLogFolder', async () => {
 });
 
 ipcMain.handle('app:hasCrashLog', () => fs.existsSync(crashLogPath) || fs.existsSync(activityLogPath));
+
+// System (not V8 heap) free memory - large uploads on a machine already low
+// on RAM is a real way to crash Electron (confirmed: two crash dumps with
+// V8's own OOM exception code landed the moment a 1.7GB upload was running
+// on a machine with under 5GB free). Let the renderer warn before it happens
+// instead of finding out via a crash.
+ipcMain.handle('system:getMemoryInfo', () => ({
+  freeBytes: os.freemem(),
+  totalBytes: os.totalmem()
+}));
 
 /* ------------------------------------------------------------------ */
 /*  Credentials (encrypted at rest via OS keychain)                    */
@@ -536,7 +564,7 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            sendToRenderer('upload-progress', {
+            sendProgressThrottled(fileName, {
               fileName,
               progress: percentCompleted,
               loaded: progressEvent.loaded,
@@ -587,7 +615,7 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            sendToRenderer('upload-progress', { fileName, progress: percentCompleted });
+            sendProgressThrottled(fileName, { fileName, progress: percentCompleted });
           }
         }
       });
