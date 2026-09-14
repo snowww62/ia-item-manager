@@ -197,14 +197,110 @@ function sendProgressThrottled(fileName, payload) {
   sendToRenderer('upload-progress', payload);
 }
 
-// A plain fs.createReadStream() left to itself will emit an unhandled
-// 'error' (and crash the process) if the underlying HTTP request aborts
-// mid-transfer (e.g. a timeout) or the file becomes unreadable mid-upload.
-// Give it a listener so that ends up as a normal rejected promise instead.
-function openUploadStream(filePath) {
-  const stream = fs.createReadStream(filePath);
-  stream.on('error', (err) => logCrash('upload stream', err));
-  return stream;
+// Dedicated keep-alive agent for the raw upload requests below (separate
+// from axiosInstance's agent - uploads and everything else have very
+// different connection lifetimes).
+const uploadAgent = new https.Agent({ rejectUnauthorized: true, keepAlive: true, maxSockets: 4 });
+
+// Raw Node https streaming PUT - deliberately bypasses axios for uploads.
+// A controlled test (throttling a local receiving server to simulate a real
+// upload connection instead of the instant localhost round-trip a naive
+// test gets) proved axios's Node adapter retains memory proportional to
+// file size once the destination can't keep up with local disk read speed:
+// process.memoryUsage().external tracked the file size almost byte-for-byte
+// (1.7GB file -> ~1.7GB external) instead of staying flat. That's the same
+// scale as the V8 fatal out-of-memory crashes (exception 0xE0000008) seen on
+// real ~1.7GB uploads. Axios wraps the body in an extra AxiosTransformStream
+// (needed to emit onUploadProgress) and re-pipes through stream.pipeline
+// before handing it to the request - piping the file stream straight into
+// the request socket here, with nothing in between, means backpressure can
+// only ever come from the one place it should: the OS socket buffer.
+function uploadFileStream({ url, filePath, headers, fileName, onProgress, maxRedirects = 5 }) {
+  return new Promise((resolve, reject) => {
+    const attempt = (currentUrl, redirectsLeft) => {
+      let parsed;
+      try {
+        parsed = new URL(currentUrl);
+      } catch (err) {
+        reject(err);
+        return;
+      }
+
+      let uploaded = 0;
+      let settled = false;
+      let lastLoggedDecile = -1;
+      const fileStream = fs.createReadStream(filePath);
+
+      const finish = (fn, arg) => {
+        if (settled) return;
+        settled = true;
+        fileStream.destroy();
+        fn(arg);
+      };
+
+      const req = https.request({
+        protocol: parsed.protocol,
+        hostname: parsed.hostname,
+        port: parsed.port || 443,
+        path: parsed.pathname + parsed.search,
+        method: 'PUT',
+        headers,
+        agent: uploadAgent
+      });
+
+      fileStream.on('error', (err) => {
+        logCrash('upload stream', err);
+        req.destroy();
+        finish(reject, err);
+      });
+
+      fileStream.on('data', (chunk) => {
+        uploaded += chunk.length;
+        if (onProgress) onProgress(uploaded);
+        // Coarse in-transit memory trail (max 10 lines/upload) - if this fix
+        // still doesn't hold on some machine, this finally gives us a memory
+        // curve captured during the actual failure window instead of only
+        // a start/end snapshot either side of it.
+        const decile = headers['Content-Length']
+          ? Math.floor((uploaded * 10) / Number(headers['Content-Length']))
+          : -1;
+        if (decile > lastLoggedDecile && decile < 10) {
+          lastLoggedDecile = decile;
+          logActivity(`upload progress: ${fileName} ${decile * 10}%`);
+        }
+      });
+
+      req.on('error', (err) => finish(reject, err));
+
+      req.on('response', (res) => {
+        if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location && redirectsLeft > 0) {
+          res.resume();
+          fileStream.destroy();
+          const nextUrl = new URL(res.headers.location, currentUrl).toString();
+          attempt(nextUrl, redirectsLeft - 1);
+          return;
+        }
+
+        const chunks = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('error', (err) => finish(reject, err));
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf8');
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            finish(resolve, { status: res.statusCode, data: body });
+          } else {
+            const err = new Error(`Request failed with status code ${res.statusCode}`);
+            err.response = { status: res.statusCode, data: body };
+            finish(reject, err);
+          }
+        });
+      });
+
+      fileStream.pipe(req);
+    };
+
+    attempt(url, maxRedirects);
+  });
 }
 
 function createWindow() {
@@ -635,24 +731,19 @@ ipcMain.handle('ia:upload', async (event, { identifier, filePath, targetFolder, 
     const response = await retryOperation(async () => {
       // A fresh stream per attempt: a Node Readable can only be consumed once,
       // and retryOperation may call this more than once on transient errors.
-      // timeout: 0 (no limit) - the instance default (60s) would abort large
-      // files mid-transfer on a normal connection.
-      return await axiosInstance({
-        method: 'put',
+      return await uploadFileStream({
         url: `https://s3.us.archive.org/${identifier}/${encodedPath}`,
-        data: openUploadStream(filePath),
-        headers: headers,
-        timeout: 0,
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            sendProgressThrottled(fileName, {
-              fileName,
-              progress: percentCompleted,
-              loaded: progressEvent.loaded,
-              total: progressEvent.total
-            });
-          }
+        filePath,
+        headers,
+        fileName,
+        onProgress: (uploaded) => {
+          const percentCompleted = Math.round((uploaded * 100) / fileSize);
+          sendProgressThrottled(fileName, {
+            fileName,
+            progress: percentCompleted,
+            loaded: uploaded,
+            total: fileSize
+          });
         }
       });
     });
@@ -690,17 +781,14 @@ ipcMain.handle('ia:createItem', async (event, { identifier, filePath, accessKey,
     if (metadata?.licenseurl) headers['x-archive-meta-licenseurl'] = metadata.licenseurl;
 
     const response = await retryOperation(async () => {
-      return await axiosInstance({
-        method: 'put',
+      return await uploadFileStream({
         url: `https://s3.us.archive.org/${identifier}/${encodeURIComponent(fileName)}`,
-        data: openUploadStream(filePath),
+        filePath,
         headers,
-        timeout: 0,
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            sendProgressThrottled(fileName, { fileName, progress: percentCompleted });
-          }
+        fileName,
+        onProgress: (uploaded) => {
+          const percentCompleted = Math.round((uploaded * 100) / fileSize);
+          sendProgressThrottled(fileName, { fileName, progress: percentCompleted });
         }
       });
     });
